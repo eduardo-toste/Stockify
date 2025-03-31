@@ -1,4 +1,14 @@
 package com.eduardo.stockify.dtos;
 
-public record DadosAutenticacao(String username, String password) {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record DadosAutenticacao(
+        @NotNull
+        @NotBlank
+        String username,
+
+        @NotNull
+        @NotBlank
+        String password) {
 }
