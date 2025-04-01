@@ -1,6 +1,5 @@
 package com.eduardo.stockify.exceptions;
 
-import com.eduardo.stockify.dtos.ErroResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,81 +12,55 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.naming.AuthenticationException;
 import java.nio.file.AccessDeniedException;
-import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Void> tratarErro404() {
+    public ResponseEntity tratarErro404() {
         return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErroResponse> tratarErro400(MethodArgumentNotValidException ex) {
-        List<DadosErroValidacao> erros = ex.getFieldErrors()
-                .stream()
-                .map(DadosErroValidacao::new)
-                .toList();
-
-        ErroResponse response = new ErroResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Erro de validação nos campos",
-                erros
-        );
-
-        return ResponseEntity.badRequest().body(response);
+    public ResponseEntity tratarErro400(MethodArgumentNotValidException ex) {
+        var erros = ex.getFieldErrors();
+        return ResponseEntity.badRequest().body(erros.stream().map(DadosErroValidacao::new).toList());
     }
 
     @ExceptionHandler(ValidacaoException.class)
-    public ResponseEntity<ErroResponse> tratarErroRegraDeNegocio(ValidacaoException ex) {
-        ErroResponse response = new ErroResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                ex.getMessage(),
-                null
-        );
-
-        return ResponseEntity.badRequest().body(response);
+    public ResponseEntity tratarErroRegraDeNegocio(ValidacaoException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErroResponse> tratarErro400(HttpMessageNotReadableException ex) {
-        ErroResponse response = new ErroResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Erro na leitura da requisição",
-                ex.getLocalizedMessage()
-        );
+    public ResponseEntity<String> tratarErro400(HttpMessageNotReadableException ex) {
+        Throwable cause = ex.getCause();
 
-        return ResponseEntity.badRequest().body(response);
+        if (cause != null && cause.getMessage().contains("com.eduardo.stockify.models.Categoria")) {
+            return ResponseEntity.badRequest().body("Valor inválido para o campo 'categoria'. Valores permitidos: OUTROS, ELETRONICO, ALIMENTO, VESTUARIO, LIVRO.");
+        }
+
+        return ResponseEntity.badRequest().body("Erro na leitura da requisição. Verifique os dados enviados.");
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErroResponse> tratarErroBadCredentials() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ErroResponse(401, "Credenciais inválidas", null));
+    public ResponseEntity tratarErroBadCredentials() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErroResponse> tratarErroAuthentication() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ErroResponse(401, "Falha na autenticação", null));
+    public ResponseEntity tratarErroAuthentication() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Falha na autenticação");
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErroResponse> tratarErroAcessoNegado() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new ErroResponse(403, "Acesso negado", null));
+    public ResponseEntity tratarErroAcessoNegado() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado");
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErroResponse> tratarErro500(Exception ex) {
-        ErroResponse response = new ErroResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Erro interno no servidor. Tente novamente mais tarde.",
-                null
-        );
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    public ResponseEntity tratarErro500(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro: " +ex.getLocalizedMessage());
     }
 
     private record DadosErroValidacao(String campo, String mensagem) {
@@ -95,5 +68,4 @@ public class GlobalExceptionHandler {
             this(erro.getField(), erro.getDefaultMessage());
         }
     }
-
 }
