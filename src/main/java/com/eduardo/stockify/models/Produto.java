@@ -26,6 +26,8 @@ public class Produto {
 
     @Enumerated(EnumType.STRING)
     private Categoria categoria;
+
+    @Column(name = "dataCadastro")
     private LocalDateTime dataCadastro;
 
 }
