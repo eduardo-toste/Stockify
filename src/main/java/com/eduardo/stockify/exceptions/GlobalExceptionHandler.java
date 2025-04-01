@@ -1,5 +1,6 @@
 package com.eduardo.stockify.exceptions;
 
+import com.eduardo.stockify.dtos.ErroResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,49 +13,81 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.naming.AuthenticationException;
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity tratarErro404() {
+    public ResponseEntity<Void> tratarErro404() {
         return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity tratarErro400(MethodArgumentNotValidException ex) {
-        var erros = ex.getFieldErrors();
-        return ResponseEntity.badRequest().body(erros.stream().map(DadosErroValidacao::new).toList());
+    public ResponseEntity<ErroResponse> tratarErro400(MethodArgumentNotValidException ex) {
+        List<DadosErroValidacao> erros = ex.getFieldErrors()
+                .stream()
+                .map(DadosErroValidacao::new)
+                .toList();
+
+        ErroResponse response = new ErroResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Erro de validação nos campos",
+                erros
+        );
+
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(ValidacaoException.class)
-    public ResponseEntity tratarErroRegraDeNegocio(ValidacaoException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<ErroResponse> tratarErroRegraDeNegocio(ValidacaoException ex) {
+        ErroResponse response = new ErroResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                null
+        );
+
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity tratarErro400(HttpMessageNotReadableException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<ErroResponse> tratarErro400(HttpMessageNotReadableException ex) {
+        ErroResponse response = new ErroResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Erro na leitura da requisição",
+                ex.getLocalizedMessage()
+        );
+
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity tratarErroBadCredentials() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
+    public ResponseEntity<ErroResponse> tratarErroBadCredentials() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErroResponse(401, "Credenciais inválidas", null));
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity tratarErroAuthentication() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Falha na autenticação");
+    public ResponseEntity<ErroResponse> tratarErroAuthentication() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErroResponse(401, "Falha na autenticação", null));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity tratarErroAcessoNegado() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado");
+    public ResponseEntity<ErroResponse> tratarErroAcessoNegado() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErroResponse(403, "Acesso negado", null));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity tratarErro500(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro: " +ex.getLocalizedMessage());
+    public ResponseEntity<ErroResponse> tratarErro500(Exception ex) {
+        ErroResponse response = new ErroResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Erro interno no servidor. Tente novamente mais tarde.",
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     private record DadosErroValidacao(String campo, String mensagem) {
