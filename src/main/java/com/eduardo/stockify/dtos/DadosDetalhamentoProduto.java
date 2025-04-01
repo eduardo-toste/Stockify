@@ -1,8 +1,7 @@
 package com.eduardo.stockify.dtos;
 
 import com.eduardo.stockify.models.Categoria;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.eduardo.stockify.models.Produto;
 
 import java.time.LocalDateTime;
 
@@ -14,4 +13,10 @@ public record DadosDetalhamentoProduto(
         int quantidade,
         Categoria categoria,
         LocalDateTime dataCadastro) {
+
+    public DadosDetalhamentoProduto(Produto produto) {
+        this(produto.getId(), produto.getNome(), produto.getDescricao(), produto.getPreco(),
+                produto.getQuantidade(), produto.getCategoria(), produto.getDataCadastro());
+    }
+
 }
