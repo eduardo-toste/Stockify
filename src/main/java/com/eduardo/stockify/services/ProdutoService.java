@@ -4,10 +4,12 @@ import com.eduardo.stockify.dtos.DadosCadastroProduto;
 import com.eduardo.stockify.dtos.DadosDetalhamentoProduto;
 import com.eduardo.stockify.models.Produto;
 import com.eduardo.stockify.repositories.ProdutoRepository;
+import com.eduardo.stockify.services.validacoes.Validacao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ProdutoService {
@@ -15,10 +17,11 @@ public class ProdutoService {
     @Autowired
     private ProdutoRepository repository;
 
+    @Autowired
+    private List<Validacao> validacao;
+
     public DadosDetalhamentoProduto criarProduto(DadosCadastroProduto dados){
-        if(repository.existsByNome(dados.nome())){
-            throw new RuntimeException("Já existe um produto cadastrado com este nome");
-        }
+        validacao.forEach(v -> v.validar(dados));
 
         var produto = new Produto(
                 null,
