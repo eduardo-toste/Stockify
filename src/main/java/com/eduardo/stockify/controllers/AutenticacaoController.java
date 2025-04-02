@@ -1,6 +1,6 @@
 package com.eduardo.stockify.controllers;
 
-import com.eduardo.stockify.dtos.DadosAutenticacao;
+import com.eduardo.stockify.dtos.AutenticacaoRequest;
 import com.eduardo.stockify.dtos.DadosTokenJWT;
 import com.eduardo.stockify.models.Usuario;
 import com.eduardo.stockify.services.TokenService;
@@ -25,7 +25,7 @@ public class AutenticacaoController {
     private TokenService tokenService;
 
     @PostMapping
-    public ResponseEntity efetuarLogin(@RequestBody @Valid DadosAutenticacao dados){
+    public ResponseEntity efetuarLogin(@RequestBody @Valid AutenticacaoRequest dados){
         var authenticationToken = new UsernamePasswordAuthenticationToken(dados.username(), dados.password());
         var authentication = manager.authenticate(authenticationToken);
 
