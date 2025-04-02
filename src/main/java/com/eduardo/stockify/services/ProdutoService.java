@@ -60,4 +60,8 @@ public class ProdutoService {
 
         return produtoEncontrado;
     }
+
+    public void excluirProduto(Long id) {
+        repository.deleteById(id);
+    }
 }
