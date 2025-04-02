@@ -1,4 +1,4 @@
-package com.eduardo.stockify.services.validacoes;
+package com.eduardo.stockify.services.validations;
 
 public interface ValidacaoEspecifica {
 

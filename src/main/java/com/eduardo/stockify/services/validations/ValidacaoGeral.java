@@ -1,4 +1,4 @@
-package com.eduardo.stockify.services.validacoes;
+package com.eduardo.stockify.services.validations;
 
 import com.eduardo.stockify.dtos.ProdutoRequest;
 

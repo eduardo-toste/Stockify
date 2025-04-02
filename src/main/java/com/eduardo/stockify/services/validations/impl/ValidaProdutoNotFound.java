@@ -1,8 +1,8 @@
-package com.eduardo.stockify.services.validacoes.impl;
+package com.eduardo.stockify.services.validations.impl;
 
 import com.eduardo.stockify.exceptions.ProdutoNotFoundException;
 import com.eduardo.stockify.repositories.ProdutoRepository;
-import com.eduardo.stockify.services.validacoes.ValidacaoEspecifica;
+import com.eduardo.stockify.services.validations.ValidacaoEspecifica;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

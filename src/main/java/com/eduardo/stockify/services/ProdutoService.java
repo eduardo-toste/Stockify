@@ -3,11 +3,10 @@ package com.eduardo.stockify.services;
 import com.eduardo.stockify.dtos.ProdutoRequest;
 import com.eduardo.stockify.dtos.ProdutoResponse;
 import com.eduardo.stockify.exceptions.EstoqueVazioException;
-import com.eduardo.stockify.exceptions.ProdutoNotFoundException;
 import com.eduardo.stockify.models.Produto;
 import com.eduardo.stockify.repositories.ProdutoRepository;
-import com.eduardo.stockify.services.validacoes.ValidacaoEspecifica;
-import com.eduardo.stockify.services.validacoes.ValidacaoGeral;
+import com.eduardo.stockify.services.validations.ValidacaoEspecifica;
+import com.eduardo.stockify.services.validations.ValidacaoGeral;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
