@@ -1,7 +1,7 @@
 package com.eduardo.stockify.controllers;
 
 import com.eduardo.stockify.dtos.AutenticacaoRequest;
-import com.eduardo.stockify.dtos.DadosTokenJWT;
+import com.eduardo.stockify.dtos.TokenResponse;
 import com.eduardo.stockify.models.Usuario;
 import com.eduardo.stockify.services.TokenService;
 import jakarta.validation.Valid;
@@ -31,7 +31,7 @@ public class AutenticacaoController {
 
         var tokenJWT = tokenService.gerarToken((Usuario) authentication.getPrincipal());
 
-        return ResponseEntity.ok(new DadosTokenJWT(tokenJWT));
+        return ResponseEntity.ok(new TokenResponse(tokenJWT));
     }
 
 }
