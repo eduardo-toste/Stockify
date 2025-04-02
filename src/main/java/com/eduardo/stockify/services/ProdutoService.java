@@ -3,6 +3,7 @@ package com.eduardo.stockify.services;
 import com.eduardo.stockify.dtos.DadosCadastroProduto;
 import com.eduardo.stockify.dtos.DadosDetalhamentoProduto;
 import com.eduardo.stockify.exceptions.EstoqueVazioException;
+import com.eduardo.stockify.exceptions.ProdutoNotFoundException;
 import com.eduardo.stockify.models.Produto;
 import com.eduardo.stockify.repositories.ProdutoRepository;
 import com.eduardo.stockify.services.validacoes.Validacao;
@@ -49,5 +50,14 @@ public class ProdutoService {
         return produtos.stream()
                 .map(DadosDetalhamentoProduto::new)
                 .toList();
+    }
+
+    public DadosDetalhamentoProduto listarProdutoPorId(Long id) {
+        var produto = repository.findById(id);
+
+        var produtoEncontrado = produto.map(DadosDetalhamentoProduto::new)
+                .orElseThrow(() -> new ProdutoNotFoundException("Produto não encontrado!"));
+
+        return produtoEncontrado;
     }
 }
