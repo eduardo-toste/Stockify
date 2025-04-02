@@ -6,7 +6,8 @@ import com.eduardo.stockify.exceptions.EstoqueVazioException;
 import com.eduardo.stockify.exceptions.ProdutoNotFoundException;
 import com.eduardo.stockify.models.Produto;
 import com.eduardo.stockify.repositories.ProdutoRepository;
-import com.eduardo.stockify.services.validacoes.Validacao;
+import com.eduardo.stockify.services.validacoes.ValidacaoEspecifica;
+import com.eduardo.stockify.services.validacoes.ValidacaoGeral;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +21,13 @@ public class ProdutoService {
     private ProdutoRepository repository;
 
     @Autowired
-    private List<Validacao> validacao;
+    private List<ValidacaoGeral> validacaoGeral;
+
+    @Autowired
+    private List<ValidacaoEspecifica> validacaoEspecifica;
 
     public ProdutoResponse criarProduto(ProdutoRequest dados){
-        validacao.forEach(v -> v.validar(dados));
+        validacaoGeral.forEach(v -> v.validar(dados));
 
         var produto = new Produto(
                 null,
@@ -53,15 +57,16 @@ public class ProdutoService {
     }
 
     public ProdutoResponse listarProdutoPorId(Long id) {
+        validacaoEspecifica.forEach(v -> v.validar(id));
+
         var produto = repository.findById(id);
 
-        var produtoEncontrado = produto.map(ProdutoResponse::new)
-                .orElseThrow(() -> new ProdutoNotFoundException("Produto não encontrado!"));
-
-        return produtoEncontrado;
+        return produto.map(ProdutoResponse::new).get();
     }
 
     public void excluirProduto(Long id) {
+        validacaoEspecifica.forEach(v -> v.validar(id));
+
         repository.deleteById(id);
     }
 }
