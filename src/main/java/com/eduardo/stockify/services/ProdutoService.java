@@ -37,4 +37,8 @@ public class ProdutoService {
 
         return new DadosDetalhamentoProduto(produtoSalvo);
     }
+
+    public List<Produto> listarProdutos(){
+        return repository.findAll();
+    }
 }
