@@ -42,4 +42,11 @@ public class ProdutoController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProdutoResponse> alterar(@PathVariable Long id, @RequestBody @Valid ProdutoRequest dados){
+        var produtoAlterado = service.alterarProduto(id, dados);
+
+        return ResponseEntity.status(HttpStatus.OK).body(produtoAlterado);
+    }
 }
