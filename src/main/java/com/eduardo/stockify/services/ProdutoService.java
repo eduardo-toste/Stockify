@@ -2,6 +2,7 @@ package com.eduardo.stockify.services;
 
 import com.eduardo.stockify.dtos.ProdutoRequest;
 import com.eduardo.stockify.dtos.ProdutoResponse;
+import com.eduardo.stockify.exceptions.AlteracaoFalhouException;
 import com.eduardo.stockify.exceptions.EstoqueVazioException;
 import com.eduardo.stockify.models.Produto;
 import com.eduardo.stockify.repositories.ProdutoRepository;
@@ -67,5 +68,27 @@ public class ProdutoService {
         validacaoEspecifica.forEach(v -> v.validar(id));
 
         repository.deleteById(id);
+    }
+
+    public ProdutoResponse alterarProduto(Long id, ProdutoRequest dados) {
+        validacaoEspecifica.forEach(v -> v.validar(id));
+        validacaoGeral.forEach(v -> v.validar(dados));
+
+        int linhasAfetadas = repository.atualizarProduto(
+                id,
+                dados.nome(),
+                dados.descricao(),
+                dados.preco(),
+                dados.quantidade(),
+                dados.categoria()
+        );
+
+        if(linhasAfetadas == 0){
+            throw new AlteracaoFalhouException("A alteração do registro falhou!");
+        }
+
+        var produtoAtualizado = repository.findById(id).get();
+
+        return new ProdutoResponse(produtoAtualizado);
     }
 }
