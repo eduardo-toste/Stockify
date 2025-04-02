@@ -31,6 +31,9 @@ public class ProdutoController {
         return ResponseEntity.status(HttpStatus.OK).body(produtos);
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Produto>
+    @GetMapping("/{id}")
+    public ResponseEntity<DadosDetalhamentoProduto> listarPorId(@PathVariable Long id){
+        var produtos = service.listarProdutoPorId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(produtos);
+    }
 }
