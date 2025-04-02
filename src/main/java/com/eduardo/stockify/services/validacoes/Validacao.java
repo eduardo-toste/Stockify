@@ -1,9 +1,9 @@
 package com.eduardo.stockify.services.validacoes;
 
-import com.eduardo.stockify.dtos.DadosCadastroProduto;
+import com.eduardo.stockify.dtos.ProdutoRequest;
 
 public interface Validacao {
 
-    void validar(DadosCadastroProduto request);
+    void validar(ProdutoRequest request);
 
 }

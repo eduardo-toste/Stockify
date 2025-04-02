@@ -1,6 +1,6 @@
 package com.eduardo.stockify.services.validacoes.impl;
 
-import com.eduardo.stockify.dtos.DadosCadastroProduto;
+import com.eduardo.stockify.dtos.ProdutoRequest;
 import com.eduardo.stockify.exceptions.ProdutoExistenteException;
 import com.eduardo.stockify.repositories.ProdutoRepository;
 import com.eduardo.stockify.services.validacoes.Validacao;
@@ -14,7 +14,7 @@ public class ValidaProdutoExistente implements Validacao {
     ProdutoRepository repository;
 
     @Override
-    public void validar(DadosCadastroProduto request) {
+    public void validar(ProdutoRequest request) {
         if(repository.existsByNome(request.nome())){
             throw new ProdutoExistenteException("Produto já cadastrado com este nome!");
         }

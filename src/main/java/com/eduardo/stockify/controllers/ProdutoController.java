@@ -1,8 +1,7 @@
 package com.eduardo.stockify.controllers;
 
-import com.eduardo.stockify.dtos.DadosCadastroProduto;
+import com.eduardo.stockify.dtos.ProdutoRequest;
 import com.eduardo.stockify.dtos.DadosDetalhamentoProduto;
-import com.eduardo.stockify.models.Produto;
 import com.eduardo.stockify.services.ProdutoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ public class ProdutoController {
     private ProdutoService service;
 
     @PostMapping
-    public ResponseEntity<DadosDetalhamentoProduto> cadastrar(@RequestBody @Valid DadosCadastroProduto dados){
+    public ResponseEntity<DadosDetalhamentoProduto> cadastrar(@RequestBody @Valid ProdutoRequest dados){
         var produtoCriado = service.criarProduto(dados);
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoCriado);
     }

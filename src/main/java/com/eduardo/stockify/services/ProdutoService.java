@@ -1,6 +1,6 @@
 package com.eduardo.stockify.services;
 
-import com.eduardo.stockify.dtos.DadosCadastroProduto;
+import com.eduardo.stockify.dtos.ProdutoRequest;
 import com.eduardo.stockify.dtos.DadosDetalhamentoProduto;
 import com.eduardo.stockify.exceptions.EstoqueVazioException;
 import com.eduardo.stockify.exceptions.ProdutoNotFoundException;
@@ -22,7 +22,7 @@ public class ProdutoService {
     @Autowired
     private List<Validacao> validacao;
 
-    public DadosDetalhamentoProduto criarProduto(DadosCadastroProduto dados){
+    public DadosDetalhamentoProduto criarProduto(ProdutoRequest dados){
         validacao.forEach(v -> v.validar(dados));
 
         var produto = new Produto(
