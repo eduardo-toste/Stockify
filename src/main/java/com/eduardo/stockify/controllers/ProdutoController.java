@@ -35,4 +35,11 @@ public class ProdutoController {
         var produtos = service.listarProdutoPorId(id);
         return ResponseEntity.status(HttpStatus.OK).body(produtos);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deletar(@PathVariable Long id){
+        service.excluirProduto(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }
