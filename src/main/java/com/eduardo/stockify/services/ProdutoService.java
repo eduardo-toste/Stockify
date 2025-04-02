@@ -39,13 +39,15 @@ public class ProdutoService {
         return new DadosDetalhamentoProduto(produtoSalvo);
     }
 
-    public List<Produto> listarProdutos(){
+    public List<DadosDetalhamentoProduto> listarProdutos(){
         var produtos = repository.findAll();
 
         if(produtos.isEmpty()){
             throw new EstoqueVazioException("Não existem produtos cadastrados!");
         }
 
-        return produtos;
+        return produtos.stream()
+                .map(DadosDetalhamentoProduto::new)
+                .toList();
     }
 }

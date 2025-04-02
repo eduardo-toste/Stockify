@@ -26,8 +26,11 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Produto>> listar(){
+    public ResponseEntity<List<DadosDetalhamentoProduto>> listar(){
         var produtos = service.listarProdutos();
         return ResponseEntity.status(HttpStatus.OK).body(produtos);
     }
+
+//    @GetMapping("/{id}")
+//    public ResponseEntity<Produto>
 }
