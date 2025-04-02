@@ -1,7 +1,7 @@
 package com.eduardo.stockify.controllers;
 
 import com.eduardo.stockify.dtos.ProdutoRequest;
-import com.eduardo.stockify.dtos.DadosDetalhamentoProduto;
+import com.eduardo.stockify.dtos.ProdutoResponse;
 import com.eduardo.stockify.services.ProdutoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +19,19 @@ public class ProdutoController {
     private ProdutoService service;
 
     @PostMapping
-    public ResponseEntity<DadosDetalhamentoProduto> cadastrar(@RequestBody @Valid ProdutoRequest dados){
+    public ResponseEntity<ProdutoResponse> cadastrar(@RequestBody @Valid ProdutoRequest dados){
         var produtoCriado = service.criarProduto(dados);
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoCriado);
     }
 
     @GetMapping
-    public ResponseEntity<List<DadosDetalhamentoProduto>> listar(){
+    public ResponseEntity<List<ProdutoResponse>> listar(){
         var produtos = service.listarProdutos();
         return ResponseEntity.status(HttpStatus.OK).body(produtos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DadosDetalhamentoProduto> listarPorId(@PathVariable Long id){
+    public ResponseEntity<ProdutoResponse> listarPorId(@PathVariable Long id){
         var produtos = service.listarProdutoPorId(id);
         return ResponseEntity.status(HttpStatus.OK).body(produtos);
     }

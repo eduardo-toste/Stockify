@@ -5,7 +5,7 @@ import com.eduardo.stockify.models.Produto;
 
 import java.time.LocalDateTime;
 
-public record DadosDetalhamentoProduto(
+public record ProdutoResponse(
         Long id,
         String nome,
         String descricao,
@@ -14,7 +14,7 @@ public record DadosDetalhamentoProduto(
         Categoria categoria,
         LocalDateTime dataCadastro) {
 
-    public DadosDetalhamentoProduto(Produto produto) {
+    public ProdutoResponse(Produto produto) {
         this(produto.getId(), produto.getNome(), produto.getDescricao(), produto.getPreco(),
                 produto.getQuantidade(), produto.getCategoria(), produto.getDataCadastro());
     }

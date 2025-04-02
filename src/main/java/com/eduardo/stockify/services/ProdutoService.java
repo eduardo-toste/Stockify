@@ -1,7 +1,7 @@
 package com.eduardo.stockify.services;
 
 import com.eduardo.stockify.dtos.ProdutoRequest;
-import com.eduardo.stockify.dtos.DadosDetalhamentoProduto;
+import com.eduardo.stockify.dtos.ProdutoResponse;
 import com.eduardo.stockify.exceptions.EstoqueVazioException;
 import com.eduardo.stockify.exceptions.ProdutoNotFoundException;
 import com.eduardo.stockify.models.Produto;
@@ -22,7 +22,7 @@ public class ProdutoService {
     @Autowired
     private List<Validacao> validacao;
 
-    public DadosDetalhamentoProduto criarProduto(ProdutoRequest dados){
+    public ProdutoResponse criarProduto(ProdutoRequest dados){
         validacao.forEach(v -> v.validar(dados));
 
         var produto = new Produto(
@@ -37,10 +37,10 @@ public class ProdutoService {
 
         var produtoSalvo = repository.save(produto);
 
-        return new DadosDetalhamentoProduto(produtoSalvo);
+        return new ProdutoResponse(produtoSalvo);
     }
 
-    public List<DadosDetalhamentoProduto> listarProdutos(){
+    public List<ProdutoResponse> listarProdutos(){
         var produtos = repository.findAll();
 
         if(produtos.isEmpty()){
@@ -48,14 +48,14 @@ public class ProdutoService {
         }
 
         return produtos.stream()
-                .map(DadosDetalhamentoProduto::new)
+                .map(ProdutoResponse::new)
                 .toList();
     }
 
-    public DadosDetalhamentoProduto listarProdutoPorId(Long id) {
+    public ProdutoResponse listarProdutoPorId(Long id) {
         var produto = repository.findById(id);
 
-        var produtoEncontrado = produto.map(DadosDetalhamentoProduto::new)
+        var produtoEncontrado = produto.map(ProdutoResponse::new)
                 .orElseThrow(() -> new ProdutoNotFoundException("Produto não encontrado!"));
 
         return produtoEncontrado;
