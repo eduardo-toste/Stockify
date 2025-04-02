@@ -2,6 +2,7 @@ package com.eduardo.stockify.services;
 
 import com.eduardo.stockify.dtos.DadosCadastroProduto;
 import com.eduardo.stockify.dtos.DadosDetalhamentoProduto;
+import com.eduardo.stockify.exceptions.EstoqueVazioException;
 import com.eduardo.stockify.models.Produto;
 import com.eduardo.stockify.repositories.ProdutoRepository;
 import com.eduardo.stockify.services.validacoes.Validacao;
@@ -39,6 +40,12 @@ public class ProdutoService {
     }
 
     public List<Produto> listarProdutos(){
-        return repository.findAll();
+        var produtos = repository.findAll();
+
+        if(produtos.isEmpty()){
+            throw new EstoqueVazioException("Não existem produtos cadastrados!");
+        }
+
+        return produtos;
     }
 }
