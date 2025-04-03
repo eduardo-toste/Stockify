@@ -2,16 +2,17 @@ package com.eduardo.stockify.dtos;
 
 import com.eduardo.stockify.models.enums.TipoMovimentacao;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record MovimentacaoRequest(
 
-        @NotBlank
+        @NotNull
         Long produtoId,
 
-        @NotBlank
+        @NotNull
         TipoMovimentacao tipo,
 
+        @NotNull
         @Min(0)
         int quantidade
 
