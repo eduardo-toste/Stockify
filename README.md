@@ -2,23 +2,25 @@
 
 Stockify é uma API de gerenciamento de estoque desenvolvida com Java e Spring Boot. Esta API permite gerenciar produtos e usuários, garantindo autenticação segura com JWT.
 
+![image](https://github.com/user-attachments/assets/31d36a60-e2c1-4ff1-8e6a-8ebe1a1c5f11)
+
 ## 🚀 Tecnologias Utilizadas
 
-### 📌 Backend
+### Backend
 - Java 23
 - Spring Boot
 - Spring Security (Autenticação JWT)
 - Spring Data JPA
 - Hibernate
 
-### 📌 Banco de Dados
+### Banco de Dados
 - MySQL (via Docker)
 - Flyway (Gerenciamento de Migração)
 
-### 📌 Documentação
+### Documentação
 - OpenAPI (SpringDoc)
 
-### 📌 Ferramentas e Build
+### Ferramentas e Build
 - Maven
 - Docker
 
@@ -42,11 +44,11 @@ com.eduardo.stockify
 
 ## 📌 Endpoints Disponíveis
 
-### 🔐 Autenticação
+### Autenticação
 - `POST /auth/login` → Autenticar usuário e gerar token
 - `POST /auth/register` → Cadastrar um novo usuário
 
-### 📦 Produtos
+### Produtos
 - `POST /produtos` → Cadastrar um novo produto
 - `GET /produtos` → Listar todos os produtos
 - `GET /produtos/{id}` → Buscar um produto específico
@@ -55,13 +57,13 @@ com.eduardo.stockify
 
 ## ⚙️ Configuração e Execução
 
-### 📌 Pré-requisitos
+### Pré-requisitos
 Certifique-se de ter as seguintes dependências instaladas:
 - Java 23
 - Docker
 - Maven
 
-### 🔧 Configuração do Banco de Dados
+### Configuração do Banco de Dados
 A aplicação utiliza um banco de dados MySQL via Docker. Para configurá-lo, execute o seguinte comando:
 ```sh
 docker run --name stockify-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=stockify -p 3306:3306 -d mysql:latest
@@ -73,7 +75,7 @@ spring.datasource.username=root
 spring.datasource.password=root
 ```
 
-### ▶️ Executando a Aplicação
+### Executando a Aplicação
 1. Clone o repositório:
    ```sh
    git clone https://github.com/eduardo-toste/stockify.git
