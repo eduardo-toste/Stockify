@@ -1,6 +1,6 @@
 package com.eduardo.stockify.dtos;
 
-import com.eduardo.stockify.models.Categoria;
+import com.eduardo.stockify.models.enums.Categoria;
 import com.eduardo.stockify.models.Produto;
 
 import java.time.LocalDateTime;

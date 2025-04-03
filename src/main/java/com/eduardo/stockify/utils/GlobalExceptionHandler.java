@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> tratarErro400(HttpMessageNotReadableException ex) {
         Throwable cause = ex.getCause();
 
-        if (cause != null && cause.getMessage().contains("com.eduardo.stockify.models.Categoria")) {
+        if (cause != null && cause.getMessage().contains("com.eduardo.stockify.models.enums.Categoria")) {
             return ResponseEntity.badRequest().body("Valor inválido para o campo 'categoria'. Valores permitidos: OUTROS, ELETRONICO, ALIMENTO, VESTUARIO, LIVRO.");
         }
 

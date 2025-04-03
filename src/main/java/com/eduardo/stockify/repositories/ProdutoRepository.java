@@ -1,10 +1,7 @@
 package com.eduardo.stockify.repositories;
 
-import com.eduardo.stockify.models.Categoria;
+import com.eduardo.stockify.models.enums.Categoria;
 import com.eduardo.stockify.models.Produto;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

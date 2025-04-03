@@ -1,5 +1,6 @@
 package com.eduardo.stockify.models;
 
+import com.eduardo.stockify.models.enums.Categoria;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
