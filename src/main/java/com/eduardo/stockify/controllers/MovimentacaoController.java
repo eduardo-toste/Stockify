@@ -1,9 +1,11 @@
 package com.eduardo.stockify.controllers;
 
 import com.eduardo.stockify.dtos.MovimentacaoRequest;
+import com.eduardo.stockify.dtos.MovimentacaoResponse;
 import com.eduardo.stockify.services.MovimentacaoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,8 +20,10 @@ public class MovimentacaoController {
     private MovimentacaoService service;
 
     @PostMapping
-    public ResponseEntity movimentacao(@RequestBody @Valid MovimentacaoRequest dados){
-        service.movimentacao(dados);
+    public ResponseEntity<MovimentacaoResponse> movimentacao(@RequestBody @Valid MovimentacaoRequest dados){
+        var movimentacao = service.movimentacao(dados);
+
+        return ResponseEntity.status(HttpStatus.OK).body(movimentacao);
     }
 
 }
