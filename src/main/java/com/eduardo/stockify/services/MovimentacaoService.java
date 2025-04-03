@@ -4,6 +4,7 @@ import com.eduardo.stockify.dtos.MovimentacaoRequest;
 import com.eduardo.stockify.dtos.MovimentacaoResponse;
 import com.eduardo.stockify.exceptions.AlteracaoFalhouException;
 import com.eduardo.stockify.models.Movimentacao;
+import com.eduardo.stockify.models.enums.TipoMovimentacao;
 import com.eduardo.stockify.repositories.MovimentacaoRepository;
 import com.eduardo.stockify.repositories.ProdutoRepository;
 import com.eduardo.stockify.services.validations.ValidacaoEspecifica;
@@ -32,7 +33,7 @@ public class MovimentacaoService {
         int quantidadeAtualizada;
         int linhasAfetadas;
 
-        if(dados.tipo().equals("ENTRADA")){
+        if(dados.tipo().equals(TipoMovimentacao.ENTRADA)){
             quantidadeAtualizada = quantidadeAtual + dados.quantidade();
             linhasAfetadas = produtoRepository.alterarQuantidade(dados.produtoId(), quantidadeAtualizada);
         } else {
