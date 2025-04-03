@@ -13,7 +13,7 @@ public record MovimentacaoRequest(
         TipoMovimentacao tipo,
 
         @NotNull
-        @Min(0)
+        @Min(1)
         int quantidade
 
 ) {
