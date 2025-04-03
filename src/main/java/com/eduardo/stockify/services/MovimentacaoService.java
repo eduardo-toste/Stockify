@@ -28,6 +28,7 @@ public class MovimentacaoService {
     public MovimentacaoResponse movimentacao(MovimentacaoRequest dados) {
         validacaoEspecifica.forEach(v -> v.validar(dados.produtoId()));
         var quantidadeAtual = produtoRepository.verificarQuantidade(dados.produtoId());
+        var produto = produtoRepository.getReferenceById(dados.produtoId());
         int quantidadeAtualizada;
         int linhasAfetadas;
 
@@ -45,7 +46,7 @@ public class MovimentacaoService {
 
         var movimentacao = new Movimentacao(
                 null,
-                dados.produtoId(),
+                produto,
                 dados.tipo(),
                 dados.quantidade(),
                 LocalDateTime.now()
