@@ -9,6 +9,7 @@ Stockify é uma API de gerenciamento de estoque desenvolvida com Java e Spring B
 ### Backend
 - Java 23
 - Spring Boot
+- Spring Web
 - Spring Security (Autenticação JWT)
 - Spring Data JPA
 - Hibernate
@@ -35,7 +36,8 @@ com.eduardo.stockify
 │── controllers (Controladores da API)
 │── dtos (Objetos de Transferência de Dados)
 │── exceptions (Exceções personalizadas)
-│── models (Modelos do banco de dados)
+│── models (Modelos e Entidades do banco de dados)
+│   ├── enums (Enums)
 │── repositories (Interfaces de repositórios JPA)
 │── services (Regras de negócio e validações)
 │── utils (Funções auxiliares)
