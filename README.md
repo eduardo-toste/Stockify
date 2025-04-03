@@ -40,6 +40,7 @@ com.eduardo.stockify
 │   ├── enums (Enums)
 │── repositories (Interfaces de repositórios JPA)
 │── services (Regras de negócio e validações)
+│   ├── validations (Classes e Interfaces de validação)
 │── utils (Funções auxiliares)
 │── resources (Scripts SQL para migração do banco)
 ```
