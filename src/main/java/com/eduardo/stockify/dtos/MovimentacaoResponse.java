@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public record MovimentacaoResponse(Long id, Long produtoId, TipoMovimentacao tipoMovimentacao, int quantidade, LocalDateTime data) {
 
     public MovimentacaoResponse(Movimentacao movimentacao){
-        this(movimentacao.getId(), movimentacao.getProdutoId(), movimentacao.getTipo(), movimentacao.getQuantidade(), movimentacao.getData());
+        this(movimentacao.getId(), movimentacao.getProduto().getId(), movimentacao.getTipo(), movimentacao.getQuantidade(), movimentacao.getData());
     }
 
 }
