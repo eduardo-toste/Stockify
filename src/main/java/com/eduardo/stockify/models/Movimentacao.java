@@ -23,7 +23,7 @@ public class Movimentacao {
 
     @ManyToOne
     @JoinColumn(name = "produto_id", nullable = false)
-    private Long produtoId;
+    private Produto produto;
 
     @Enumerated(EnumType.STRING)
     private TipoMovimentacao tipo;
