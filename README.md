@@ -58,6 +58,11 @@ com.eduardo.stockify
 - `PUT /produtos/{id}` → Atualizar informações do produto
 - `DELETE /produtos/{id}` → Remover um produto
 
+### Movimentações de Estoque
+- `POST /movimentacoes` → Registrar entrada/saída de produtos
+- `GET /movimentacoes` → Listar movimentações de estoque
+- `GET /movimentacoes/{id}` → Buscar movimentação específica
+
 ## ⚙️ Configuração e Execução
 
 ### Pré-requisitos
