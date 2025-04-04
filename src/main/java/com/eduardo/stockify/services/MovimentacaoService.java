@@ -33,6 +33,10 @@ public class MovimentacaoService {
         int quantidadeAtualizada;
         int linhasAfetadas;
 
+        if(dados.quantidade() > quantidadeAtual){
+            throw new RuntimeException("A quantidade da movimentação não pode ser maior que a quantidade em estoque!");
+        }
+
         if(dados.tipo().equals(TipoMovimentacao.ENTRADA)){
             quantidadeAtualizada = quantidadeAtual + dados.quantidade();
             linhasAfetadas = produtoRepository.alterarQuantidade(dados.produtoId(), quantidadeAtualizada);
