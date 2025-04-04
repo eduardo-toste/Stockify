@@ -2,7 +2,9 @@ package com.eduardo.stockify.services;
 
 import com.eduardo.stockify.dtos.MovimentacaoRequest;
 import com.eduardo.stockify.dtos.MovimentacaoResponse;
+import com.eduardo.stockify.dtos.ProdutoResponse;
 import com.eduardo.stockify.exceptions.AlteracaoFalhouException;
+import com.eduardo.stockify.exceptions.EstoqueVazioException;
 import com.eduardo.stockify.models.Movimentacao;
 import com.eduardo.stockify.models.enums.TipoMovimentacao;
 import com.eduardo.stockify.repositories.MovimentacaoRepository;
@@ -60,5 +62,25 @@ public class MovimentacaoService {
         var movimentacaoSalva = movimentacaoRepository.save(movimentacao);
 
         return new MovimentacaoResponse(movimentacaoSalva);
+    }
+
+    public List<MovimentacaoResponse> listarMovimentacoes() {
+        var movimentacoes = movimentacaoRepository.findAll();
+
+        if(movimentacoes.isEmpty()){
+            throw new EstoqueVazioException("Não existem movimentações!");
+        }
+
+        return movimentacoes.stream()
+                .map(MovimentacaoResponse::new)
+                .toList();
+    }
+
+    public MovimentacaoResponse listarMovimentacoesPorId(Long id) {
+        validacaoEspecifica.forEach(v -> v.validar(id));
+
+        var movimentacao = movimentacaoRepository.findById(id);
+
+        return movimentacao.map(MovimentacaoResponse::new).get();
     }
 }
