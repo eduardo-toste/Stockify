@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ValidaProdutoNotFound implements ValidacaoEspecifica {
+public class ValidaRegistroNotFound implements ValidacaoEspecifica {
 
     @Autowired
     private ProdutoRepository repository;
@@ -15,7 +15,7 @@ public class ValidaProdutoNotFound implements ValidacaoEspecifica {
     @Override
     public void validar(Long id) {
         if(!repository.existsById(id)){
-            throw new ProdutoNotFoundException("Produto não encontrado no estoque!");
+            throw new ProdutoNotFoundException("Registro não encontrado no estoque!");
         }
     }
 
