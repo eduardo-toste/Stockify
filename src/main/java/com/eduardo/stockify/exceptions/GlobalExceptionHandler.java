@@ -1,4 +1,4 @@
-package com.eduardo.stockify.utils;
+package com.eduardo.stockify.exceptions;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
