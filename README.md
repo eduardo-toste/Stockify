@@ -47,8 +47,6 @@ com.eduardo.stockify
 
 ## 📌 Endpoints Disponíveis
 
-## 📌 Endpoints Disponíveis
-
 ### Autenticação
 - `POST /auth/login` → Autenticar usuário e gerar token
 - `POST /auth/register` → Cadastrar um novo usuário
