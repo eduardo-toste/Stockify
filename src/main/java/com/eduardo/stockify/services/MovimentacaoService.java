@@ -11,6 +11,8 @@ import com.eduardo.stockify.repositories.MovimentacaoRepository;
 import com.eduardo.stockify.repositories.ProdutoRepository;
 import com.eduardo.stockify.services.validations.ValidacaoEspecifica;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -64,16 +66,14 @@ public class MovimentacaoService {
         return new MovimentacaoResponse(movimentacaoSalva);
     }
 
-    public List<MovimentacaoResponse> listarMovimentacoes() {
-        var movimentacoes = movimentacaoRepository.findAll();
+    public Page<MovimentacaoResponse> listarMovimentacoes(Pageable pageable) {
+        var movimentacoes = movimentacaoRepository.findAll(pageable);
 
         if(movimentacoes.isEmpty()){
             throw new EstoqueVazioException("Não existem movimentações!");
         }
 
-        return movimentacoes.stream()
-                .map(MovimentacaoResponse::new)
-                .toList();
+        return movimentacoes.map(MovimentacaoResponse::new);
     }
 
     public MovimentacaoResponse listarMovimentacoesPorId(Long id) {

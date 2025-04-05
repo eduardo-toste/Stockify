@@ -6,6 +6,8 @@ import com.eduardo.stockify.services.MovimentacaoService;
 import com.eduardo.stockify.services.MovimentacoesExportService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +35,8 @@ public class MovimentacaoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MovimentacaoResponse>> listar(){
-        var listaMovimentacoes = service.listarMovimentacoes();
+    public ResponseEntity<Page<MovimentacaoResponse>> listar(Pageable pageable){
+        var listaMovimentacoes = service.listarMovimentacoes(pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(listaMovimentacoes);
     }
