@@ -6,6 +6,8 @@ import com.eduardo.stockify.services.ProdutoExportService;
 import com.eduardo.stockify.services.ProdutoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,8 +34,8 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProdutoResponse>> listar(){
-        var produtos = service.listarProdutos();
+    public ResponseEntity<Page<ProdutoResponse>> listar(Pageable pageable){
+        var produtos = service.listarProdutos(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(produtos);
     }
 

@@ -9,6 +9,8 @@ import com.eduardo.stockify.repositories.ProdutoRepository;
 import com.eduardo.stockify.services.validations.ValidacaoEspecifica;
 import com.eduardo.stockify.services.validations.ValidacaoGeral;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -44,16 +46,14 @@ public class ProdutoService {
         return new ProdutoResponse(produtoSalvo);
     }
 
-    public List<ProdutoResponse> listarProdutos(){
-        var produtos = repository.findAll();
+    public Page<ProdutoResponse> listarProdutos(Pageable pageable){
+        var produtos = repository.findAll(pageable);
 
         if(produtos.isEmpty()){
             throw new EstoqueVazioException("Não existem produtos cadastrados!");
         }
 
-        return produtos.stream()
-                .map(ProdutoResponse::new)
-                .toList();
+        return produtos.map(ProdutoResponse::new);
     }
 
     public ProdutoResponse listarProdutoPorId(Long id) {
