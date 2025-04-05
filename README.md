@@ -1,6 +1,6 @@
 # 📦 Stockify API
 
-Stockify é uma API de gerenciamento de estoque desenvolvida com Java e Spring Boot. Esta API permite gerenciar produtos e usuários, garantindo autenticação segura com JWT.
+Stockify é uma API para controle de estoque desenvolvida com Java 23 e Spring Boot. Permite o gerenciamento de produtos, registro de movimentações de entrada e saída e consulta de estatísticas. Conta com autenticação via JWT, documentação automatizada com OpenAPI e banco de dados MySQL gerenciado por Docker e Flyway. As listagens mais complexas são paginadas para melhorar a usabilidade, e os dados podem ser exportados em formato Excel. A estrutura segue boas práticas com separação em camadas, tratamento global de exceções e uso de JPA com Hibernate para persistência.
 
 ![image](https://github.com/user-attachments/assets/31d36a60-e2c1-4ff1-8e6a-8ebe1a1c5f11)
 
@@ -47,6 +47,8 @@ com.eduardo.stockify
 
 ## 📌 Endpoints Disponíveis
 
+## 📌 Endpoints Disponíveis
+
 ### Autenticação
 - `POST /auth/login` → Autenticar usuário e gerar token
 - `POST /auth/register` → Cadastrar um novo usuário
@@ -57,11 +59,17 @@ com.eduardo.stockify
 - `GET /produtos/{id}` → Buscar um produto específico
 - `PUT /produtos/{id}` → Atualizar informações do produto
 - `DELETE /produtos/{id}` → Remover um produto
+- `GET /produtos/exportar` → Exportar lista de produtos (xlsx)
 
 ### Movimentações de Estoque
-- `POST /movimentacoes` → Registrar entrada/saída de produtos
-- `GET /movimentacoes` → Listar movimentações de estoque
-- `GET /movimentacoes/{id}` → Buscar movimentação específica
+- `POST /movimentacao` → Registrar entrada/saída de produtos
+- `GET /movimentacao` → Listar movimentações de estoque
+- `GET /movimentacao/{id}` → Buscar movimentação específica
+- `GET /movimentacao/exportar` → Exportar lista de movimentações (xlsx)
+
+### Estatísticas
+- `GET /estatisticas` → Consultar estatísticas do estoque
+
 
 ## ⚙️ Configuração e Execução
 
