@@ -32,10 +32,9 @@ public class MovimentacaoService {
 
     public MovimentacaoResponse movimentacao(MovimentacaoRequest dados) {
         validacaoEspecifica.forEach(v -> v.validar(dados.produtoId()));
-        var quantidadeAtual = produtoRepository.verificarQuantidade(dados.produtoId());
         var produto = produtoRepository.getReferenceById(dados.produtoId());
 
-        int linhasAfetadas = alterarQuantidade(dados.produtoId(), quantidadeAtual, dados.quantidade(), dados.tipo());
+        int linhasAfetadas = alterarQuantidade(dados.produtoId(), dados.quantidade(), dados.tipo());
 
         if (linhasAfetadas == 0) {
             throw new AlteracaoFalhouException("A movimentação do produto falhou!");
@@ -54,7 +53,8 @@ public class MovimentacaoService {
         return new MovimentacaoResponse(movimentacaoSalva);
     }
 
-    public int alterarQuantidade(Long produtoId, int quantidadeAtual, int quantidadeMovimentada, TipoMovimentacao tipo) {
+    public int alterarQuantidade(Long produtoId, int quantidadeMovimentada, TipoMovimentacao tipo) {
+        var quantidadeAtual = produtoRepository.verificarQuantidade(produtoId);
         int quantidadeAtualizada;
 
         if (tipo.equals(TipoMovimentacao.ENTRADA)) {
