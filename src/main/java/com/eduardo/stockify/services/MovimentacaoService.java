@@ -34,22 +34,10 @@ public class MovimentacaoService {
         validacaoEspecifica.forEach(v -> v.validar(dados.produtoId()));
         var quantidadeAtual = produtoRepository.verificarQuantidade(dados.produtoId());
         var produto = produtoRepository.getReferenceById(dados.produtoId());
-        int quantidadeAtualizada;
-        int linhasAfetadas;
 
-        if(dados.quantidade() > quantidadeAtual){
-            throw new RuntimeException("A quantidade da movimentação não pode ser maior que a quantidade em estoque!");
-        }
+        int linhasAfetadas = alterarQuantidade(dados.produtoId(), quantidadeAtual, dados.quantidade(), dados.tipo());
 
-        if(dados.tipo().equals(TipoMovimentacao.ENTRADA)){
-            quantidadeAtualizada = quantidadeAtual + dados.quantidade();
-            linhasAfetadas = produtoRepository.alterarQuantidade(dados.produtoId(), quantidadeAtualizada);
-        } else {
-            quantidadeAtualizada = quantidadeAtual - dados.quantidade();
-            linhasAfetadas = produtoRepository.alterarQuantidade(dados.produtoId(), quantidadeAtualizada);
-        }
-
-        if(linhasAfetadas == 0){
+        if (linhasAfetadas == 0) {
             throw new AlteracaoFalhouException("A movimentação do produto falhou!");
         }
 
@@ -64,6 +52,21 @@ public class MovimentacaoService {
         var movimentacaoSalva = movimentacaoRepository.save(movimentacao);
 
         return new MovimentacaoResponse(movimentacaoSalva);
+    }
+
+    public int alterarQuantidade(Long produtoId, int quantidadeAtual, int quantidadeMovimentada, TipoMovimentacao tipo) {
+        int quantidadeAtualizada;
+
+        if (tipo.equals(TipoMovimentacao.ENTRADA)) {
+            quantidadeAtualizada = quantidadeAtual + quantidadeMovimentada;
+        } else {
+            if (quantidadeMovimentada > quantidadeAtual) {
+                throw new RuntimeException("A quantidade da movimentação não pode ser maior que a quantidade em estoque!");
+            }
+            quantidadeAtualizada = quantidadeAtual - quantidadeMovimentada;
+        }
+
+        return produtoRepository.alterarQuantidade(produtoId, quantidadeAtualizada);
     }
 
     public Page<MovimentacaoResponse> listarMovimentacoes(Pageable pageable) {
