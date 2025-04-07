@@ -1,5 +1,6 @@
 package com.eduardo.stockify.models;
 
+import com.eduardo.stockify.dtos.ProdutoRequest;
 import com.eduardo.stockify.models.enums.Categoria;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,4 +32,11 @@ public class Produto {
     @Column(name = "dataCadastro")
     private LocalDateTime dataCadastro;
 
+    public Produto(ProdutoRequest data) {
+        this.nome = data.nome();
+        this.descricao = data.descricao();
+        this.preco = data.preco();
+        this.quantidade = data.quantidade();
+        this.categoria = data.categoria();
+    }
 }
