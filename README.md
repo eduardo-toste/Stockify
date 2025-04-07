@@ -1,8 +1,12 @@
 # 📦 Stockify API
 
-Stockify é uma API para controle de estoque desenvolvida com Java 23 e Spring Boot. Permite o gerenciamento de produtos, registro de movimentações de entrada e saída e consulta de estatísticas. Conta com autenticação via JWT, documentação automatizada com OpenAPI e banco de dados MySQL gerenciado por Docker e Flyway. As listagens mais complexas são paginadas para melhorar a usabilidade, e os dados podem ser exportados em formato Excel. A estrutura segue boas práticas com separação em camadas, tratamento global de exceções e uso de JPA com Hibernate para persistência.
+Stockify é uma API para controle de estoque desenvolvida com **Java 23** e **Spring Boot**. A aplicação permite o gerenciamento de produtos, registro de movimentações de entrada e saída, e consulta de estatísticas. Conta com autenticação via **JWT**, documentação automatizada com **OpenAPI**, banco de dados **MySQL** gerenciado por **Docker e Flyway**, e uma cobertura sólida de **testes unitários com JUnit 5 e Mockito** para garantir a confiabilidade e qualidade das funcionalidades.
+
+As listagens mais complexas são paginadas para melhorar a usabilidade, e os dados podem ser exportados em formato **Excel**. A estrutura segue boas práticas com separação em camadas, tratamento global de exceções, uso de JPA com Hibernate para persistência e uma arquitetura preparada para evolução contínua.
 
 ![image](https://github.com/user-attachments/assets/31d36a60-e2c1-4ff1-8e6a-8ebe1a1c5f11)
+
+---
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -18,12 +22,19 @@ Stockify é uma API para controle de estoque desenvolvida com Java 23 e Spring B
 - MySQL (via Docker)
 - Flyway (Gerenciamento de Migração)
 
+### Testes
+- JUnit 5 (Testes unitários)
+- Mockito (Mock de dependências)
+- Spring Boot Test
+
 ### Documentação
 - OpenAPI (SpringDoc)
 
 ### Ferramentas e Build
 - Maven
 - Docker
+
+---
 
 ## 📂 Estrutura do Projeto
 
@@ -67,7 +78,6 @@ com.eduardo.stockify
 
 ### Estatísticas
 - `GET /estatisticas` → Consultar estatísticas do estoque
-
 
 ## ⚙️ Configuração e Execução
 
