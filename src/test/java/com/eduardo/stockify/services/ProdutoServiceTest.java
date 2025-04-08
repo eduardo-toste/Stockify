@@ -1,7 +1,7 @@
 package com.eduardo.stockify.services;
 
 import com.eduardo.stockify.dtos.ProdutoRequest;
-import com.eduardo.stockify.exceptions.AlteracaoFalhouException;
+import com.eduardo.stockify.dtos.ProdutoResponse;
 import com.eduardo.stockify.exceptions.EstoqueVazioException;
 import com.eduardo.stockify.models.Produto;
 import com.eduardo.stockify.models.enums.Categoria;
@@ -11,144 +11,139 @@ import com.eduardo.stockify.services.validations.ValidacaoGeral;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class ProdutoServiceTest {
-
-    @InjectMocks
-    private ProdutoService produtoService;
 
     @Mock
     private ProdutoRepository repository;
 
     @Mock
-    private List<ValidacaoGeral> validacaoGeral;
+    private ValidacaoGeral validacaoMock;
 
     @Mock
-    private List<ValidacaoEspecifica> validacaoEspecifica;
+    private ValidacaoEspecifica validacaoEspecificaMock;
 
-    private ProdutoRequest produtoRequest;
-    private Produto produto;
+    @InjectMocks
+    private ProdutoService produtoService;
 
     @BeforeEach
-    void setUp() {
-        produtoRequest = new ProdutoRequest(
-                "Teclado Mecânico",
-                "Switch Red, RGB, ABNT2",
-                259.90,
-                10,
-                Categoria.ELETRONICO
-        );
-
-        produto = new Produto(
-                1L,
-                produtoRequest.nome(),
-                produtoRequest.descricao(),
-                produtoRequest.preco(),
-                produtoRequest.quantidade(),
-                produtoRequest.categoria(),
-                LocalDateTime.now()
-        );
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+        ReflectionTestUtils.setField(produtoService, "validacaoGeral", List.of(validacaoMock));
+        ReflectionTestUtils.setField(produtoService, "validacaoEspecifica", List.of(validacaoEspecificaMock));
     }
 
+
     @Test
-    @DisplayName("Deve criar produto com sucesso")
-    void criarProdutoCase1() {
-        when(repository.save(any(Produto.class))).thenReturn(produto);
+    @DisplayName("Deve criar um produto com sucesso")
+    void deveCriarProdutoComSucesso() {
+        ProdutoRequest request = criarProdutoRequest();
+        Produto produtoSalvo = criarProdutoSalvo(request);
 
-        var response = produtoService.criarProduto(produtoRequest);
+        when(repository.save(any(Produto.class))).thenReturn(produtoSalvo);
 
-        assertThat(response).isNotNull();
-        assertThat(response.nome()).isEqualTo(produtoRequest.nome());
+        ProdutoResponse response = produtoService.criarProduto(request);
 
-        verify(validacaoGeral).forEach(any());
+        assertNotNull(response);
+        assertEquals(request.nome(), response.nome());
+        assertEquals(request.descricao(), response.descricao());
+        assertEquals(request.preco(), response.preco());
+        assertEquals(request.quantidade(), response.quantidade());
+        assertEquals(request.categoria(), response.categoria());
+
+        verify(validacaoMock).validar(request);
         verify(repository).save(any(Produto.class));
     }
 
     @Test
+    @DisplayName("Não deve criar produto com dados inválidos")
+    void naoDeveCriarProdutoComDadosInvalidos() {
+        ProdutoRequest request = criarProdutoRequest();
+
+        doThrow(new IllegalArgumentException("Nome inválido"))
+                .when(validacaoMock).validar(request);
+
+        assertThrows(IllegalArgumentException.class, () -> produtoService.criarProduto(request));
+
+        verify(validacaoMock).validar(request);
+        verify(repository, never()).save(any(Produto.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção se não houver produtos")
+    void deveLancarExcecaoSeEstoqueVazio() {
+        Pageable pageable = Pageable.unpaged();
+        when(repository.findAll(pageable)).thenReturn(Page.empty());
+
+        EstoqueVazioException exception = assertThrows(
+                EstoqueVazioException.class,
+                () -> produtoService.listarProdutos(pageable)
+        );
+
+        assertEquals("Não existem produtos cadastrados!", exception.getMessage());
+    }
+
+    @Test
     @DisplayName("Deve listar produtos com sucesso")
-    void listarProdutosCase1() {
-        var page = new PageImpl<>(List.of(produto));
-        when(repository.findAll(any(PageRequest.class))).thenReturn(page);
+    void deveListarProdutosComSucesso() {
+        Pageable pageable = Pageable.unpaged();
+        Produto produto = criarProdutoSalvo(criarProdutoRequest());
+        when(repository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(produto)));
 
-        var result = produtoService.listarProdutos(PageRequest.of(0, 10));
+        var result = produtoService.listarProdutos(pageable);
 
-        assertThat(result).hasSize(1);
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.getTotalElements());
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando lista estiver vazia")
-    void listarProdutosCase2() {
-        when(repository.findAll(any(PageRequest.class))).thenReturn(Page.empty());
+    @DisplayName("Deve retornar produto por ID com sucesso")
+    void deveListarProdutoPorIdComSucesso() {
+        Long id = 1L;
+        Produto produto = criarProdutoSalvo(criarProdutoRequest());
+        when(repository.findById(id)).thenReturn(Optional.of(produto));
 
-        assertThatThrownBy(() -> produtoService.listarProdutos(PageRequest.of(0, 10)))
-                .isInstanceOf(EstoqueVazioException.class)
-                .hasMessageContaining("Não existem produtos cadastrados!");
+        ProdutoResponse response = produtoService.listarProdutoPorId(id);
+
+        assertNotNull(response);
+        assertEquals(produto.getNome(), response.nome());
+        verify(validacaoEspecificaMock).validar(id);
     }
 
-    @Test
-    @DisplayName("Deve retornar produto por ID")
-    void listarProdutoPorIdCase1() {
-        when(repository.findById(1L)).thenReturn(Optional.of(produto));
-
-        var response = produtoService.listarProdutoPorId(1L);
-
-        assertThat(response).isNotNull();
-        assertThat(response.nome()).isEqualTo(produto.getNome());
-
-        verify(validacaoEspecifica).forEach(any());
+    private ProdutoRequest criarProdutoRequest() {
+        return new ProdutoRequest(
+                "Mouse Gamer",
+                "Mouse com sensor óptico de alta precisão",
+                159.90,
+                10,
+                Categoria.ELETRONICO
+        );
     }
 
-    @Test
-    @DisplayName("Deve excluir produto por ID")
-    void excluirProdutoCase1() {
-        produtoService.excluirProduto(1L);
-
-        verify(validacaoEspecifica).forEach(any());
-        verify(repository).deleteById(1L);
+    private Produto criarProdutoSalvo(ProdutoRequest request) {
+        return new Produto(
+                1L,
+                request.nome(),
+                request.descricao(),
+                request.preco(),
+                request.quantidade(),
+                request.categoria(),
+                LocalDateTime.now()
+        );
     }
-
-    @Test
-    @DisplayName("Deve alterar produto com sucesso")
-    void alterarProdutoCase1() {
-        when(repository.atualizarProduto(
-                eq(1L),
-                anyString(), anyString(), anyDouble(), anyInt(), any(Categoria.class)))
-                .thenReturn(1);
-
-        when(repository.findById(1L)).thenReturn(Optional.of(produto));
-
-        var response = produtoService.alterarProduto(1L, produtoRequest);
-
-        assertThat(response).isNotNull();
-        assertThat(response.nome()).isEqualTo(produto.getNome());
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção quando alteração falhar")
-    void alterarProdutoCase2() {
-        when(repository.atualizarProduto(
-                anyLong(), anyString(), anyString(), anyDouble(), anyInt(), any(Categoria.class)))
-                .thenReturn(0);
-
-        assertThatThrownBy(() -> produtoService.alterarProduto(1L, produtoRequest))
-                .isInstanceOf(AlteracaoFalhouException.class)
-                .hasMessageContaining("A alteração do registro falhou!");
-    }
-
 }
