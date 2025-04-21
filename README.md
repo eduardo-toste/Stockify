@@ -6,7 +6,7 @@ As listagens mais complexas são paginadas para melhorar a usabilidade, e os dad
 
 ![image](https://github.com/user-attachments/assets/31d36a60-e2c1-4ff1-8e6a-8ebe1a1c5f11)
 
----
+
 
 ## 🚀 Tecnologias Utilizadas
 
