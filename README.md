@@ -1,4 +1,4 @@
-# 📦 Stockify API
+# Stockify API
 
 Stockify é uma API para controle de estoque desenvolvida com **Java 23** e **Spring Boot**. A aplicação permite o gerenciamento de produtos, registro de movimentações de entrada e saída, e consulta de estatísticas. Conta com autenticação via **JWT**, documentação automatizada com **OpenAPI**, banco de dados **MySQL** gerenciado por **Docker e Flyway**, e uma cobertura sólida de **testes unitários com JUnit 5 e Mockito** para garantir a confiabilidade e qualidade das funcionalidades.
 
