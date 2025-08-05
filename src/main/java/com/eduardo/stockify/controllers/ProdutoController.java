@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/produtos")
@@ -60,13 +61,10 @@ public class ProdutoController {
     }
 
     @GetMapping("/exportar")
-    public ResponseEntity<byte[]> exportar() throws IOException {
-        byte[] excelBytes = exportService.export("Produtos");
+    public ResponseEntity<Map<String, String>> exportar() throws IOException {
+        Map<String, String> response = exportService.enviarParaS3("Produtos");
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"produtos.xlsx\"")
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .body(excelBytes);
+        return ResponseEntity.ok(response);
     }
 
 }

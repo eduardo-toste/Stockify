@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/movimentacao")
@@ -49,13 +50,10 @@ public class MovimentacaoController {
     }
 
     @GetMapping("/exportar")
-    public ResponseEntity<byte[]> exportar() throws IOException {
-        byte[] excelBytes = exportService.export("Movimentações");
+    public ResponseEntity<Map<String, String>> exportar() throws IOException {
+        Map<String, String> response = exportService.enviarParaS3("Movimentacoes");
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"movimentações.xlsx\"")
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .body(excelBytes);
+        return ResponseEntity.ok(response);
     }
 
 
