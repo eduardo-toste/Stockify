@@ -32,6 +32,18 @@ jobs:
           target: "/home/ec2-user/"
           overwrite: true
 
+      - name: Verificar arquivo .jar na EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "📁 Verificando existência do .jar..."
+            ls -lah /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar
+            echo "🔐 Hash do .jar (para validação):"
+            sha256sum /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar || echo "Arquivo não encontrado"
+
       - name: Reiniciar aplicação via SSH com tmux
         uses: appleboy/ssh-action@v1.0.3
         with:
