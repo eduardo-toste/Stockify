@@ -38,8 +38,19 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            pkill -f 'stockify-0.0.1-SNAPSHOT.jar' || true
+            echo "➡️ Parando aplicação anterior (se estiver rodando)..."
+            pkill -f 'stockify-0.0.1-SNAPSHOT.jar' || echo "Nenhum processo antigo encontrado."
+            sleep 2
+
+            echo "➡️ Iniciando aplicação com nohup + disown..."
             nohup java -Dspring.profiles.active=prod -jar /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar > output.log 2>&1 &
             sleep 3
-            pgrep -f stockify
-            echo "Aplicação reiniciada com sucesso"
+            PID=$(pgrep -f stockify)
+
+            if [ -n "$PID" ]; then
+              echo "✅ Aplicação iniciada com PID $PID"
+            else
+              echo "❌ Falha ao iniciar aplicação"
+              cat output.log | tail -n 20
+              exit 1
+            fi
