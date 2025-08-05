@@ -38,16 +38,12 @@ jobs:
             echo "🧹 Limpando .jar antigo da home..."
             rm -f /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar
 
-      - name: 🚀 Copiar .jar para EC2 (upload limpo)
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./target/stockify-0.0.1-SNAPSHOT.jar"
-          target: "/home/ec2-user/"
-          strip_components: 0  # <- Certo aqui (o default já é 0)
-          overwrite: true
+      - name: 🚀 Copiar .jar para EC2 (modo confiável)
+        run: |
+          echo "📤 Enviando JAR diretamente com scp..."
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no target/stockify-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/stockify-0.0.1-SNAPSHOT.jar
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: 🔍 Verificar .jar na EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -61,22 +57,18 @@ jobs:
             echo "🔐 Hash do .jar:"
             sha256sum /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar || echo "❌ JAR não encontrado"
 
-      - name: 🔄 Reiniciar aplicação com tmux
+      - name: 🔄 Reiniciar aplicação com nohup
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "🔧 Instalando tmux (se necessário)..."
-            sudo yum install -y -q tmux
+            echo "🛑 Matando processo antigo..."
+            pkill -f 'stockify-0.0.1-SNAPSHOT.jar' || echo "Nenhum processo anterior."
 
-            echo "🛑 Matando sessões e processos antigos..."
-            pkill -f 'stockify-0.0.1-SNAPSHOT.jar' || true
-            tmux kill-session -t stockify || true
-
-            echo "🚀 Iniciando aplicação via tmux..."
-            tmux new-session -d -s stockify "java -Dspring.profiles.active=prod -jar /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar"
+            echo "🚀 Iniciando aplicação com nohup..."
+            nohup java -Dspring.profiles.active=prod -jar /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar > output.log 2>&1 & disown
 
             sleep 5
             echo "🧪 Verificando se a aplicação subiu..."
