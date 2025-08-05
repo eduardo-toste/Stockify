@@ -28,42 +28,34 @@ jobs:
           sha256sum target/stockify-0.0.1-SNAPSHOT.jar || echo "❌ JAR não encontrado"
           ls -lh target/stockify-0.0.1-SNAPSHOT.jar
 
-      - name: 🧹 Remover .jar antigo na EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            echo "🧹 Limpando .jar antigo da home..."
-            rm -f /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar
-
-      - name: 🚀 Copiar .jar para EC2 (modo confiável)
+      - name: 🔐 Preparar chave SSH
         run: |
-          echo "📤 Enviando JAR diretamente com scp..."
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no target/stockify-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/stockify-0.0.1-SNAPSHOT.jar
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 🧹 Remover .jar antigo na EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "rm -f /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar"
+
+      - name: 🚀 Copiar .jar para EC2
+        run: |
+          echo "📤 Enviando JAR para EC2..."
+          scp -i ~/.ssh/id_rsa target/stockify-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/stockify-0.0.1-SNAPSHOT.jar
 
       - name: 🔍 Verificar .jar na EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             echo "📁 Arquivo recebido:"
             ls -lh /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar
             echo "🔐 Hash do .jar:"
             sha256sum /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar || echo "❌ JAR não encontrado"
+          EOF
 
       - name: 🔄 Reiniciar aplicação com nohup
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             echo "🛑 Matando processo antigo..."
             pkill -f 'stockify-0.0.1-SNAPSHOT.jar' || echo "Nenhum processo anterior."
 
@@ -74,3 +66,4 @@ jobs:
             echo "🧪 Verificando se a aplicação subiu..."
             pgrep -f stockify || { echo '❌ A aplicação não iniciou'; tail -n 30 output.log || true; exit 1; }
             echo "✅ Aplicação rodando com sucesso"
+          EOF
