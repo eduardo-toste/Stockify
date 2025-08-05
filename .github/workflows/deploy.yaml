@@ -42,15 +42,16 @@ jobs:
             pkill -f 'stockify-0.0.1-SNAPSHOT.jar' || echo "Nenhum processo antigo encontrado."
             sleep 2
 
-            echo "➡️ Iniciando aplicação com nohup + disown..."
-            nohup java -Dspring.profiles.active=prod -jar /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar > output.log 2>&1 &
+            echo "➡️ Iniciando aplicação com setsid..."
+            setsid bash -c "java -Dspring.profiles.active=prod -jar /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar > output.log 2>&1 &"
             sleep 3
+
             PID=$(pgrep -f stockify)
 
             if [ -n "$PID" ]; then
               echo "✅ Aplicação iniciada com PID $PID"
             else
               echo "❌ Falha ao iniciar aplicação"
-              cat output.log | tail -n 20
+              tail -n 20 output.log
               exit 1
             fi
