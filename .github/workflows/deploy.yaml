@@ -1,0 +1,41 @@
+name: Deploy - Stockify
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build da aplicação
+        run: mvn clean package -DskipTests=true
+
+      - name: Copiar .jar para EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "target/stockify-0.0.1-SNAPSHOT.jar"
+          target: "/home/ec2-user"
+
+      - name: Reiniciar aplicação via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            pkill -f 'stockify-0.0.1-SNAPSHOT.jar' || true
+            nohup java -Dspring-boot.profiles.active=prod -jar stockify-0.0.1-SNAPSHOT.jar > output.log 2>&1 &
