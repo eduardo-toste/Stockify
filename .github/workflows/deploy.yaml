@@ -10,19 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do código
+      - name: 📦 Checkout do código
         uses: actions/checkout@v3
 
-      - name: Setup Java
+      - name: ☕ Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Build da aplicação
+      - name: 🛠️ Build da aplicação
         run: mvn clean package -DskipTests=true
 
-      - name: Copiar .jar para EC2
+      - name: 🧮 Hash do .jar gerado
+        run: |
+          echo "SHA256 local:"
+          sha256sum target/stockify-0.0.1-SNAPSHOT.jar || echo "❌ JAR não encontrado"
+          ls -lh target/stockify-0.0.1-SNAPSHOT.jar
+
+      - name: 🚀 Copiar .jar para EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -32,19 +38,19 @@ jobs:
           target: "/home/ec2-user/"
           strip_components: 0
 
-      - name: Verificar arquivo .jar na EC2
+      - name: 🔍 Verificar .jar na EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "📁 Verificando existência do .jar..."
-            ls -lah /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar
-            echo "🔐 Hash do .jar (para validação):"
-            sha256sum /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar || echo "Arquivo não encontrado"
+            echo "📁 Arquivo recebido:"
+            ls -lh /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar
+            echo "🔐 Hash do .jar:"
+            sha256sum /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar || echo "❌ JAR não encontrado"
 
-      - name: Reiniciar aplicação via SSH com tmux
+      - name: 🔄 Reiniciar aplicação com tmux
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -52,21 +58,16 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             echo "🔧 Instalando tmux (se necessário)..."
-            sudo yum install -y tmux
+            sudo yum install -y -q tmux
 
-            echo "🛑 Matando sessões anteriores..."
+            echo "🛑 Matando sessões e processos antigos..."
             pkill -f 'stockify-0.0.1-SNAPSHOT.jar' || true
             tmux kill-session -t stockify || true
 
-            echo "🚀 Iniciando nova sessão tmux com aplicação..."
+            echo "🚀 Iniciando aplicação via tmux..."
             tmux new-session -d -s stockify "java -Dspring.profiles.active=prod -jar /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar"
 
             sleep 5
-            PID=$(pgrep -f stockify)
-            if [ -n "$PID" ]; then
-              echo "✅ Aplicação iniciada com PID $PID na sessão tmux 'stockify'"
-            else
-              echo "❌ Falha ao iniciar aplicação"
-              tail -n 30 output.log || true
-              exit 1
-            fi
+            echo "🧪 Verificando se a aplicação subiu..."
+            pgrep -f stockify || { echo '❌ A aplicação não iniciou'; tail -n 30 output.log; exit 1; }
+            echo "✅ Aplicação rodando com sucesso"
