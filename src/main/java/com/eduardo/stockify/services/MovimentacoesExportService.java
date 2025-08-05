@@ -1,5 +1,6 @@
 package com.eduardo.stockify.services;
 
+import com.eduardo.stockify.aws.s3.S3Service;
 import com.eduardo.stockify.models.Movimentacao;
 import com.eduardo.stockify.repositories.MovimentacaoRepository;
 import com.eduardo.stockify.utils.ExcelExporter;
@@ -11,8 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class MovimentacoesExportService extends ExcelExporter<Movimentacao> {
 
-    @Autowired
-    private MovimentacaoRepository repository;
+    private final MovimentacaoRepository repository;
+
+    public MovimentacoesExportService(S3Service s3Service, MovimentacaoRepository movimentacaoRepository) {
+        super(s3Service);
+        this.repository = movimentacaoRepository;
+    }
 
     @Override
     protected void createHeader(Sheet sheet) {
