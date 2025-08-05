@@ -42,7 +42,7 @@ jobs:
             pkill -f 'stockify-0.0.1-SNAPSHOT.jar' || echo "Nenhum processo anterior."
 
             echo "🚀 Iniciando nova aplicação..."
-            setsid nohup java -Dspring.profiles.active=prod -jar /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar > output.log 2>&1 < /dev/null &
+            java -Dspring.profiles.active=prod -jar /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar > output.log 2>&1 < /dev/null &
 
             sleep 5
             PID=$(pgrep -f stockify)
