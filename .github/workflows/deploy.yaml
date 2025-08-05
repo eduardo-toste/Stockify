@@ -28,7 +28,7 @@ jobs:
           sha256sum target/stockify-0.0.1-SNAPSHOT.jar || echo "❌ JAR não encontrado"
           ls -lh target/stockify-0.0.1-SNAPSHOT.jar
 
-      - name: 🧹 Remover .jar antigo na EC2 (antes do upload)
+      - name: 🧹 Remover .jar antigo na EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -38,7 +38,7 @@ jobs:
             echo "🧹 Limpando .jar antigo da home..."
             rm -f /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar
 
-      - name: 🚀 Copiar .jar para EC2
+      - name: 🚀 Copiar .jar para EC2 (upload limpo)
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -46,8 +46,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "./target/stockify-0.0.1-SNAPSHOT.jar"
           target: "/home/ec2-user/"
+          strip_components: 0  # <- Certo aqui (o default já é 0)
           overwrite: true
-          strip_components: 0
 
       - name: 🔍 Verificar .jar na EC2
         uses: appleboy/ssh-action@v1.0.3
