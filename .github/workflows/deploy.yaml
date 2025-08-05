@@ -31,25 +31,29 @@ jobs:
           source: "target/stockify-0.0.1-SNAPSHOT.jar"
           target: "/home/ec2-user"
 
-      - name: Reiniciar aplicação via SSH
+      - name: Reiniciar aplicação via SSH com tmux
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "🔄 Parando aplicação anterior..."
-            pkill -f 'stockify-0.0.1-SNAPSHOT.jar' || echo "Nenhum processo anterior."
+            echo "🔧 Instalando tmux (se necessário)..."
+            sudo yum install -y tmux
 
-            echo "🚀 Iniciando nova aplicação..."
-            java -Dspring.profiles.active=prod -jar /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar > output.log 2>&1 < /dev/null &
+            echo "🛑 Matando sessões anteriores..."
+            pkill -f 'stockify-0.0.1-SNAPSHOT.jar' || true
+            tmux kill-session -t stockify || true
+
+            echo "🚀 Iniciando nova sessão tmux com aplicação..."
+            tmux new-session -d -s stockify "java -Dspring.profiles.active=prod -jar /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar"
 
             sleep 5
             PID=$(pgrep -f stockify)
             if [ -n "$PID" ]; then
-              echo "✅ Aplicação iniciada com PID $PID"
+              echo "✅ Aplicação iniciada com PID $PID na sessão tmux 'stockify'"
             else
               echo "❌ Falha ao iniciar aplicação"
-              tail -n 30 output.log
+              tail -n 30 output.log || true
               exit 1
             fi
