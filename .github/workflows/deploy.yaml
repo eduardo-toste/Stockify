@@ -29,7 +29,8 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "target/stockify-0.0.1-SNAPSHOT.jar"
-          target: "/home/ec2-user"
+          target: "/home/ec2-user/"
+          overwrite: true
 
       - name: Reiniciar aplicação via SSH com tmux
         uses: appleboy/ssh-action@v1.0.3
