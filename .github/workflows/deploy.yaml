@@ -39,5 +39,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             pkill -f 'stockify-0.0.1-SNAPSHOT.jar' || true
-            nohup java -Dspring.profiles.active=prod -jar stockify-0.0.1-SNAPSHOT.jar > output.log 2>&1 &
+            nohup java -Dspring.profiles.active=prod -jar /home/ec2-user/stockify-0.0.1-SNAPSHOT.jar > output.log 2>&1 &
+            sleep 3
+            pgrep -f stockify
             echo "Aplicação reiniciada com sucesso"
