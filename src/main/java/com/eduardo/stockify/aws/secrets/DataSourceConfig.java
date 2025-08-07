@@ -1,4 +1,4 @@
-package com.eduardo.stockify.aws.secretsmanager;
+package com.eduardo.stockify.aws.secrets;
 
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;

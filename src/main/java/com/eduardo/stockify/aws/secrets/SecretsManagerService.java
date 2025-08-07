@@ -1,4 +1,4 @@
-package com.eduardo.stockify.aws.secretsmanager;
+package com.eduardo.stockify.aws.secrets;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
