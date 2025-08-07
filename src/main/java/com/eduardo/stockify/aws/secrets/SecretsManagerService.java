@@ -32,4 +32,12 @@ public class SecretsManagerService {
             throw new RuntimeException("Erro ao parsear segredo", e);
         }
     }
+
+    public String getSimpleSecret(String secretName) {
+        var request = GetSecretValueRequest.builder()
+                .secretId(secretName)
+                .build();
+        var secretValue = client.getSecretValue(request);
+        return secretValue.secretString();
+    }
 }
