@@ -30,5 +30,3 @@ jobs:
 
       - name: Build e testes
         run: mvn clean install
-        env:
-          SPRING_PROFILES_ACTIVE: dev

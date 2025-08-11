@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Profile;
 public class JwtSecretConfig {
 
     @Bean(name = "jwtSecret")
-    @Profile("dev")
+    @Profile("!prod")
     public String devJwtSecret(
             @Value("${security.jwt.secret:12345678}") String secret) {
         return secret;
