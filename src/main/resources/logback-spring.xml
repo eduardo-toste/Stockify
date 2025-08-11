@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
+<configuration scan="true">
 
-    <property name="LOG_FILE" value="/home/ec2-user/stockify.log"/>
+    <springProfile name="dev">
+        <property name="LOG_FILE" value="./logs/stockify.log"/>
+    </springProfile>
+
+    <springProfile name="prod">
+        <property name="LOG_FILE" value="/home/ec2-user/stockify.log"/>
+    </springProfile>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>${LOG_FILE}</file>
@@ -18,8 +24,7 @@
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
     </root>
-
 </configuration>
