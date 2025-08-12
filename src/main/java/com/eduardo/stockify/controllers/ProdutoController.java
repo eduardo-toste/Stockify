@@ -5,6 +5,7 @@ import com.eduardo.stockify.dtos.ProdutoResponse;
 import com.eduardo.stockify.services.ProdutoExportService;
 import com.eduardo.stockify.services.ProdutoService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,13 +21,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/produtos")
+@RequiredArgsConstructor
 public class ProdutoController {
 
-    @Autowired
-    private ProdutoService service;
-
-    @Autowired
-    private ProdutoExportService exportService;
+    private final ProdutoService service;
+    private final ProdutoExportService exportService;
 
     @PostMapping
     public ResponseEntity<ProdutoResponse> cadastrar(@RequestBody @Valid ProdutoRequest dados){

@@ -22,34 +22,53 @@ public class TokenService {
         this.secret = secret;
     }
 
-    public String gerarToken(Usuario usuario) {
+    public String gerarAccessToken(String username) {
+        return gerarToken(username, dataExpiracaoAccessToken(), "access");
+    }
+
+    public String gerarRefreshToken(String username) {
+        return gerarToken(username, dataExpiracaoRefreshToken(), "refresh");
+    }
+
+    public String gerarToken(String usuario, Instant expiraEm, String type) {
         try {
             var algoritmo = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("API Stockify")
-                    .withSubject(usuario.getUsername())
-                    .withExpiresAt(dataExpiracao())
+                    .withSubject(usuario)
+                    .withClaim("type", type)
+                    .withExpiresAt(expiraEm)
                     .sign(algoritmo);
         } catch (JWTCreationException exception){
             throw new RuntimeException("Erro ao gerar Token JWT", exception);
         }
     }
 
-    public String getSubject(String tokenJWT){
+    public String getSubject(String token, String expectedType){
         try {
             var algoritmo = Algorithm.HMAC256(secret);
-            return JWT.require(algoritmo)
+            var decoded = JWT.require(algoritmo)
                     .withIssuer("API Stockify")
                     .build()
-                    .verify(tokenJWT)
-                    .getSubject();
+                    .verify(token);
+
+            String type = decoded.getClaim("type").asString();
+            if (!expectedType.equals(type)) {
+                throw new RuntimeException("Tipo de token inválido!");
+            }
+
+            return decoded.getSubject();
         } catch (JWTVerificationException exception) {
             throw new RuntimeException("Token JWT inválido ou expirado!");
         }
     }
 
-    private Instant dataExpiracao() {
+    private Instant dataExpiracaoAccessToken() {
         return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+    }
+
+    private Instant dataExpiracaoRefreshToken() {
+        return LocalDateTime.now().plusDays(7).toInstant(ZoneOffset.of("-03:00"));
     }
 
 }
