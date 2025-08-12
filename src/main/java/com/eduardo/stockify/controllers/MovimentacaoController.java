@@ -5,6 +5,7 @@ import com.eduardo.stockify.dtos.MovimentacaoResponse;
 import com.eduardo.stockify.services.MovimentacaoService;
 import com.eduardo.stockify.services.MovimentacoesExportService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,13 +21,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/movimentacao")
+@RequiredArgsConstructor
 public class MovimentacaoController {
 
-    @Autowired
-    private MovimentacaoService service;
-
-    @Autowired
-    private MovimentacoesExportService exportService;
+    private final MovimentacaoService service;
+    private final MovimentacoesExportService exportService;
 
     @PostMapping
     public ResponseEntity<MovimentacaoResponse> movimentacao(@RequestBody @Valid MovimentacaoRequest dados){
