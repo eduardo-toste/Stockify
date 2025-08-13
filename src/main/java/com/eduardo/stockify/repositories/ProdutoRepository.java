@@ -13,7 +13,6 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     boolean existsByNome(String nome);
 
     @Modifying
-    @Transactional
     @Query("UPDATE Produto p SET p.nome = :nome, p.descricao = :descricao, p.preco = :preco, p.quantidade = :quantidade, p.categoria = :categoria WHERE p.id = :id")
     int atualizarProduto(Long id, String nome, String descricao, double preco, int quantidade, Categoria categoria);
 
@@ -21,7 +20,6 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     int verificarQuantidade(Long produtoId);
 
     @Modifying
-    @Transactional
     @Query("UPDATE Produto p SET p.quantidade = :quantidadeAtualizada WHERE p.id = :produtoId")
     int alterarQuantidade(Long produtoId, int quantidadeAtualizada);
 }

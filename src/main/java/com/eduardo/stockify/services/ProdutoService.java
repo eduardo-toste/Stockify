@@ -8,6 +8,7 @@ import com.eduardo.stockify.models.Produto;
 import com.eduardo.stockify.repositories.ProdutoRepository;
 import com.eduardo.stockify.services.validations.ValidacaoEspecifica;
 import com.eduardo.stockify.services.validations.ValidacaoGeral;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -70,6 +71,7 @@ public class ProdutoService {
         repository.deleteById(id);
     }
 
+    @Transactional
     public ProdutoResponse alterarProduto(Long id, ProdutoRequest dados) {
         validacaoEspecifica.forEach(v -> v.validar(id));
         validacaoGeral.forEach(v -> v.validar(dados));
