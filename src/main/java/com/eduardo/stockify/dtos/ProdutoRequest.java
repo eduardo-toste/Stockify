@@ -1,23 +1,21 @@
 package com.eduardo.stockify.dtos;
 
 import com.eduardo.stockify.models.enums.Categoria;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 
 public record ProdutoRequest(
 
         @NotBlank
+        @Size(max = 120)
         String nome,
 
+        @Size(max = 2000)
         String descricao,
 
-        @NotNull
         @Positive
         double preco,
 
-        @NotNull
-        @Positive
+        @PositiveOrZero
         int quantidade,
 
         @NotNull

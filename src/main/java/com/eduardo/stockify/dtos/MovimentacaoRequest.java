@@ -12,7 +12,6 @@ public record MovimentacaoRequest(
         @NotNull
         TipoMovimentacao tipo,
 
-        @NotNull
         @Min(1)
         int quantidade
 
