@@ -1,10 +1,14 @@
 package com.eduardo.stockify.exceptions;
 
+import com.eduardo.stockify.utils.ProblemDetailsUtils;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,6 +19,36 @@ import java.nio.file.AccessDeniedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    // NOVOS
+
+    @ExceptionHandler(UsuarioExistenteException.class)
+    public ResponseEntity<ProblemDetail> handleUsuarioExistente(UsuarioExistenteException ex,
+                                                                HttpServletRequest req) {
+        var body = ProblemDetailsUtils.build(
+                HttpStatus.CONFLICT,
+                "Conflito",
+                ex.getMessage(),
+                UsuarioExistenteException.CODE,
+                req.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    @ExceptionHandler({ UsernameNotFoundException.class, BadCredentialsException.class })
+    public ResponseEntity<ProblemDetail> handleAuthFailures(RuntimeException ex,
+                                                                HttpServletRequest req) {
+        var body = ProblemDetailsUtils.build(
+                HttpStatus.UNAUTHORIZED,
+                "Não autenticado",
+                "Credenciais inválidas",
+                "AUTH_FAILED",
+                req.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
+    // VELHOS
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity tratarErro404() {
@@ -36,11 +70,6 @@ public class GlobalExceptionHandler {
         }
 
         return ResponseEntity.badRequest().body("Erro na leitura da requisição. Verifique os dados enviados.");
-    }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity tratarErroBadCredentials() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
     }
 
     @ExceptionHandler(AuthenticationException.class)
