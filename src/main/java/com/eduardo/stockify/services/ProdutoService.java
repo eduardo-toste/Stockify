@@ -9,7 +9,7 @@ import com.eduardo.stockify.repositories.ProdutoRepository;
 import com.eduardo.stockify.services.validations.ValidacaoEspecifica;
 import com.eduardo.stockify.services.validations.ValidacaoGeral;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,15 +18,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProdutoService {
 
-    @Autowired
     private ProdutoRepository repository;
-
-    @Autowired
     private List<ValidacaoGeral> validacaoGeral;
-
-    @Autowired
     private List<ValidacaoEspecifica> validacaoEspecifica;
 
     public ProdutoResponse criarProduto(ProdutoRequest dados){
