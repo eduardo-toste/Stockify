@@ -22,4 +22,13 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     @Modifying
     @Query("UPDATE Produto p SET p.quantidade = :quantidadeAtualizada WHERE p.id = :produtoId")
     int alterarQuantidade(Long produtoId, int quantidadeAtualizada);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+       UPDATE Produto p
+          SET p.quantidade = p.quantidade + :delta
+        WHERE p.id = :produtoId
+          AND (p.quantidade + :delta) >= 0
+    """)
+    int aplicarDeltaDeEstoque(Long produtoId, int delta);
 }
