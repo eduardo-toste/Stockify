@@ -48,6 +48,34 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleResourceNotFound(ResourceNotFoundException ex,
+                                                                HttpServletRequest req) {
+        var body = ProblemDetailsUtils.build(
+                HttpStatus.NOT_FOUND,
+                "Não encontrado",
+                ex.getMessage(),
+                ResourceNotFoundException.CODE,
+                req.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(EstoqueInsuficienteException.class)
+    public ResponseEntity<ProblemDetail> handleEstoqueInsuficiente(EstoqueInsuficienteException ex,
+                                                                   HttpServletRequest req) {
+        var body = ProblemDetailsUtils.build(
+                HttpStatus.CONFLICT,
+                "Conflito",
+                ex.getMessage(),
+                ResourceNotFoundException.CODE,
+                req.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
     // VELHOS
 
     @ExceptionHandler(EntityNotFoundException.class)
