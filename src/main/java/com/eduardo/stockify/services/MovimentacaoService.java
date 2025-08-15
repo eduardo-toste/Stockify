@@ -2,90 +2,65 @@ package com.eduardo.stockify.services;
 
 import com.eduardo.stockify.dtos.MovimentacaoRequest;
 import com.eduardo.stockify.dtos.MovimentacaoResponse;
-import com.eduardo.stockify.dtos.ProdutoResponse;
-import com.eduardo.stockify.exceptions.AlteracaoFalhouException;
-import com.eduardo.stockify.exceptions.EstoqueVazioException;
-import com.eduardo.stockify.models.Movimentacao;
+import com.eduardo.stockify.exceptions.EstoqueInsuficienteException;
+import com.eduardo.stockify.exceptions.ProdutoNotFoundException;
+import com.eduardo.stockify.exceptions.TransactionFailedException;
+import com.eduardo.stockify.exceptions.ResourceNotFoundException;
+import com.eduardo.stockify.mapper.MovimentacaoMapper;
 import com.eduardo.stockify.models.enums.TipoMovimentacao;
 import com.eduardo.stockify.repositories.MovimentacaoRepository;
 import com.eduardo.stockify.repositories.ProdutoRepository;
 import com.eduardo.stockify.services.validations.ValidacaoEspecifica;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MovimentacaoService {
 
-    @Autowired
-    private MovimentacaoRepository movimentacaoRepository;
+    private final MovimentacaoRepository movimentacaoRepository;
+    private final ProdutoRepository produtoRepository;
 
-    @Autowired
-    private ProdutoRepository produtoRepository;
-
-    @Autowired
-    private List<ValidacaoEspecifica> validacaoEspecifica;
-
-    public MovimentacaoResponse movimentacao(MovimentacaoRequest dados) {
-        validacaoEspecifica.forEach(v -> v.validar(dados.produtoId()));
-        var produto = produtoRepository.getReferenceById(dados.produtoId());
-
-        int linhasAfetadas = alterarQuantidade(dados.produtoId(), dados.quantidade(), dados.tipo());
-
-        if (linhasAfetadas == 0) {
-            throw new AlteracaoFalhouException("A movimentação do produto falhou!");
+    @Transactional
+    public MovimentacaoResponse criarMovimentacao(MovimentacaoRequest dados) {
+        if(!produtoRepository.existsById(dados.produtoId())){
+            throw new ResourceNotFoundException("Produto não encontrado");
         }
 
-        var movimentacao = new Movimentacao(
-                null,
-                produto,
-                dados.tipo(),
-                dados.quantidade(),
-                LocalDateTime.now()
-        );
+        var produto = produtoRepository.getReferenceById(dados.produtoId());
+        alterarQuantidade(dados.produtoId(), dados.quantidade(), dados.tipo());
 
-        var movimentacaoSalva = movimentacaoRepository.save(movimentacao);
-
-        return new MovimentacaoResponse(movimentacaoSalva);
+        var movimentacao = MovimentacaoMapper.toEntity(produto, dados);
+        movimentacaoRepository.save(movimentacao);
+        return MovimentacaoMapper.toDTO(movimentacao);
     }
 
     @Transactional
-    public int alterarQuantidade(Long produtoId, int quantidadeMovimentada, TipoMovimentacao tipo) {
-        var quantidadeAtual = produtoRepository.verificarQuantidade(produtoId);
-        int quantidadeAtualizada;
+    public void alterarQuantidade(Long produtoId, int quantidadeMovimentada, TipoMovimentacao tipo) {
+        int delta = (tipo == TipoMovimentacao.ENTRADA) ? quantidadeMovimentada : -quantidadeMovimentada;
 
-        if (tipo.equals(TipoMovimentacao.ENTRADA)) {
-            quantidadeAtualizada = quantidadeAtual + quantidadeMovimentada;
-        } else {
-            if (quantidadeMovimentada > quantidadeAtual) {
-                throw new RuntimeException("A quantidade da movimentação não pode ser maior que a quantidade em estoque!");
-            }
-            quantidadeAtualizada = quantidadeAtual - quantidadeMovimentada;
+        int rows = produtoRepository.aplicarDeltaDeEstoque(produtoId, delta);
+        if (rows == 1) return;
+
+        if (produtoRepository.existsById(produtoId)) {
+            throw new EstoqueInsuficienteException("Estoque insuficiente para a movimentação solicitada.");
         }
-
-        return produtoRepository.alterarQuantidade(produtoId, quantidadeAtualizada);
+        throw new ResourceNotFoundException("Produto %d não encontrado.".formatted(produtoId));
     }
 
     public Page<MovimentacaoResponse> listarMovimentacoes(Pageable pageable) {
         var movimentacoes = movimentacaoRepository.findAll(pageable);
-
-        if(movimentacoes.isEmpty()){
-            throw new EstoqueVazioException("Não existem movimentações!");
-        }
-
-        return movimentacoes.map(MovimentacaoResponse::new);
+        return MovimentacaoMapper.toPageDTO(movimentacoes);
     }
 
     public MovimentacaoResponse listarMovimentacoesPorId(Long id) {
-        validacaoEspecifica.forEach(v -> v.validar(id));
-
-        var movimentacao = movimentacaoRepository.findById(id);
-
-        return movimentacao.map(MovimentacaoResponse::new).get();
+        var movimentacao = movimentacaoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Movimentação não encontrada"));
+        return MovimentacaoMapper.toDTO(movimentacao);
     }
 }
