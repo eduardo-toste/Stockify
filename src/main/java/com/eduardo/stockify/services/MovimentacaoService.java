@@ -3,21 +3,16 @@ package com.eduardo.stockify.services;
 import com.eduardo.stockify.dtos.MovimentacaoRequest;
 import com.eduardo.stockify.dtos.MovimentacaoResponse;
 import com.eduardo.stockify.exceptions.EstoqueInsuficienteException;
-import com.eduardo.stockify.exceptions.ProdutoNotFoundException;
-import com.eduardo.stockify.exceptions.TransactionFailedException;
 import com.eduardo.stockify.exceptions.ResourceNotFoundException;
 import com.eduardo.stockify.mapper.MovimentacaoMapper;
 import com.eduardo.stockify.models.enums.TipoMovimentacao;
 import com.eduardo.stockify.repositories.MovimentacaoRepository;
 import com.eduardo.stockify.repositories.ProdutoRepository;
-import com.eduardo.stockify.services.validations.ValidacaoEspecifica;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
