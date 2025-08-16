@@ -14,9 +14,4 @@ public record ProdutoResponse(
         Categoria categoria,
         LocalDateTime dataCadastro) {
 
-    public ProdutoResponse(Produto produto) {
-        this(produto.getId(), produto.getNome(), produto.getDescricao(), produto.getPreco(),
-                produto.getQuantidade(), produto.getCategoria(), produto.getDataCadastro());
-    }
-
 }
