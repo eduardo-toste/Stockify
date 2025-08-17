@@ -2,93 +2,67 @@ package com.eduardo.stockify.services;
 
 import com.eduardo.stockify.dtos.ProdutoRequest;
 import com.eduardo.stockify.dtos.ProdutoResponse;
-import com.eduardo.stockify.exceptions.AlteracaoFalhouException;
-import com.eduardo.stockify.exceptions.EstoqueVazioException;
+import com.eduardo.stockify.dtos.ProdutoUpdateResponse;
+import com.eduardo.stockify.exceptions.ProdutoExistenteException;
+import com.eduardo.stockify.exceptions.ResourceNotFoundException;
+import com.eduardo.stockify.exceptions.TransactionFailedException;
+import com.eduardo.stockify.mapper.ProdutoMapper;
 import com.eduardo.stockify.models.Produto;
 import com.eduardo.stockify.repositories.ProdutoRepository;
-import com.eduardo.stockify.services.validations.ValidacaoEspecifica;
-import com.eduardo.stockify.services.validations.ValidacaoGeral;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Service
+@RequiredArgsConstructor
 public class ProdutoService {
 
-    @Autowired
-    private ProdutoRepository repository;
-
-    @Autowired
-    private List<ValidacaoGeral> validacaoGeral;
-
-    @Autowired
-    private List<ValidacaoEspecifica> validacaoEspecifica;
+    private final ProdutoRepository repository;
 
     public ProdutoResponse criarProduto(ProdutoRequest dados){
-        validacaoGeral.forEach(v -> v.validar(dados));
-
-        var produto = new Produto(
-                null,
-                dados.nome(),
-                dados.descricao(),
-                dados.preco(),
-                dados.quantidade(),
-                dados.categoria(),
-                LocalDateTime.now()
-        );
-
-        var produtoSalvo = repository.save(produto);
-
-        return new ProdutoResponse(produtoSalvo);
+        verificarExistenciaProduto(dados);
+        var produto = ProdutoMapper.toEntity(dados);
+        repository.save(produto);
+        return ProdutoMapper.toDTO(produto);
     }
 
     public Page<ProdutoResponse> listarProdutos(Pageable pageable){
         var produtos = repository.findAll(pageable);
-
-        if(produtos.isEmpty()){
-            throw new EstoqueVazioException("Não existem produtos cadastrados!");
-        }
-
-        return produtos.map(ProdutoResponse::new);
+        return ProdutoMapper.toPageDTO(produtos);
     }
 
-    public ProdutoResponse listarProdutoPorId(Long id) {
-        validacaoEspecifica.forEach(v -> v.validar(id));
-
-        var produto = repository.findById(id);
-
-        return produto.map(ProdutoResponse::new).get();
+    public ProdutoResponse listarProdutoPorId(Long id) {;
+        return ProdutoMapper.toDTO(buscarProdutoPorId(id));
     }
 
     public void excluirProduto(Long id) {
-        validacaoEspecifica.forEach(v -> v.validar(id));
-
+        buscarProdutoPorId(id);
         repository.deleteById(id);
     }
 
-    public ProdutoResponse alterarProduto(Long id, ProdutoRequest dados) {
-        validacaoEspecifica.forEach(v -> v.validar(id));
-        validacaoGeral.forEach(v -> v.validar(dados));
+    @Transactional
+    public ProdutoUpdateResponse alterarProduto(Long id, ProdutoRequest dados) {
+        buscarProdutoPorId(id);
+        var produtoAtualizado = ProdutoMapper.toEntity(id, dados);
 
-        int linhasAfetadas = repository.atualizarProduto(
-                id,
-                dados.nome(),
-                dados.descricao(),
-                dados.preco(),
-                dados.quantidade(),
-                dados.categoria()
-        );
-
+        int linhasAfetadas = repository.atualizarProduto(produtoAtualizado);
         if(linhasAfetadas == 0){
-            throw new AlteracaoFalhouException("A alteração do registro falhou!");
+            throw new TransactionFailedException("A alteração falhou");
         }
 
-        var produtoAtualizado = repository.findById(id).get();
+        return ProdutoMapper.toUpdateDTO(produtoAtualizado);
+    }
 
-        return new ProdutoResponse(produtoAtualizado);
+    private void verificarExistenciaProduto(ProdutoRequest request) {
+        if(repository.existsByNome(request.nome())){
+            throw new ProdutoExistenteException("Produto já cadastrado com este nome");
+        }
+    }
+
+    private Produto buscarProdutoPorId(Long id) {
+        return repository.findById(id).
+                orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
     }
 }

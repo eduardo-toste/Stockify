@@ -1,5 +1,6 @@
 package com.eduardo.stockify.config.security;
 
+import com.eduardo.stockify.models.Usuario;
 import com.eduardo.stockify.repositories.UsuarioRepository;
 import com.eduardo.stockify.services.TokenService;
 import jakarta.servlet.FilterChain;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import lombok.extern.slf4j.Slf4j;
@@ -39,15 +41,17 @@ public class SecurityFilter extends OncePerRequestFilter {
 
                     String subject = tokenService.getSubject(token, "access");
 
-                    var usuario = usuarioRepository.findByUsername(subject);
-                    if (usuario != null && usuario.isEnabled()) {
-                        var authentication = new UsernamePasswordAuthenticationToken(
-                                usuario, null, usuario.getAuthorities());
-
-                        var context = SecurityContextHolder.createEmptyContext();
-                        context.setAuthentication(authentication);
-                        SecurityContextHolder.setContext(context);
-                    }
+                    usuarioRepository.findByUsername(subject)
+                            .filter(Usuario::isEnabled)
+                            .ifPresent(usuario -> {
+                                var auth = new UsernamePasswordAuthenticationToken(
+                                        usuario, null, usuario.getAuthorities());
+                                auth.setDetails(new org.springframework.security.web.authentication.WebAuthenticationDetailsSource()
+                                        .buildDetails(request));
+                                var context = SecurityContextHolder.createEmptyContext();
+                                context.setAuthentication(auth);
+                                SecurityContextHolder.setContext(context);
+                            });
 
                 } catch (Exception ex) {
                     log.debug("Falha ao validar JWT: {}", ex.getMessage(), ex);

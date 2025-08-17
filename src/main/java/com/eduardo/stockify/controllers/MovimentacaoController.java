@@ -29,7 +29,7 @@ public class MovimentacaoController {
 
     @PostMapping
     public ResponseEntity<MovimentacaoResponse> movimentacao(@RequestBody @Valid MovimentacaoRequest dados){
-        var movimentacao = service.movimentacao(dados);
+        var movimentacao = service.criarMovimentacao(dados);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(movimentacao);
     }

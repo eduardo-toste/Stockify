@@ -2,6 +2,7 @@ package com.eduardo.stockify.controllers;
 
 import com.eduardo.stockify.dtos.ProdutoRequest;
 import com.eduardo.stockify.dtos.ProdutoResponse;
+import com.eduardo.stockify.dtos.ProdutoUpdateResponse;
 import com.eduardo.stockify.services.ProdutoExportService;
 import com.eduardo.stockify.services.ProdutoService;
 import jakarta.validation.Valid;
@@ -53,7 +54,7 @@ public class ProdutoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProdutoResponse> alterar(@PathVariable Long id, @RequestBody @Valid ProdutoRequest dados){
+    public ResponseEntity<ProdutoUpdateResponse> alterar(@PathVariable Long id, @RequestBody @Valid ProdutoRequest dados){
         var produtoAlterado = service.alterarProduto(id, dados);
 
         return ResponseEntity.status(HttpStatus.OK).body(produtoAlterado);
