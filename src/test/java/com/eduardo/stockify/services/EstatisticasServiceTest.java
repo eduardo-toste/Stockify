@@ -4,6 +4,7 @@ import com.eduardo.stockify.dtos.EstatisticasResponse;
 import com.eduardo.stockify.models.Produto;
 import com.eduardo.stockify.models.enums.Categoria;
 import com.eduardo.stockify.repositories.ProdutoRepository;
+import com.eduardo.stockify.utils.ProdutoTestUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,9 +30,9 @@ class EstatisticasServiceTest {
     @Test
     void deveRetornarEstatisticasCalculadas() {
         // Arrange
-        var produto1 = new Produto(1L, "Produto A", "Descrição", 10.0, 2, Categoria.OUTROS);
-        var produto2 = new Produto(2L, "Produto B", "Descrição", 40.0, 2, Categoria.OUTROS);
-        var valorEsperado = new EstatisticasResponse(2L, 4L, 50.0, 25.0, 10.0, 40.0);
+        var produto1 = ProdutoTestUtils.criarProduto(1L, "Produto A");
+        var produto2 = ProdutoTestUtils.criarProduto(2L, "Produto B");
+        var valorEsperado = new EstatisticasResponse(2L, 10L, 60.0, 30.0, 30.0, 30.0);
         when(produtoRepository.findAll()).thenReturn(List.of(produto1, produto2));
 
         // Act
