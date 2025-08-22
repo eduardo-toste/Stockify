@@ -12,13 +12,17 @@ public class EstatisticasMapper {
             DoubleSummaryStatistics statsPreco,
             IntSummaryStatistics statsQuantidade) {
 
+        double media = statsPreco.getCount() == 0 ? 0.0 : statsPreco.getAverage();
+        double min = statsPreco.getCount() == 0 ? 0.0 : statsPreco.getMin();
+        double max = statsPreco.getCount() == 0 ? 0.0 : statsPreco.getMax();
+
         return new EstatisticasResponse(
                 statsPreco.getCount(),
                 statsQuantidade.getSum(),
                 statsPreco.getSum(),
-                statsPreco.getAverage(),
-                statsPreco.getMin(),
-                statsPreco.getMax()
+                media,
+                min,
+                max
         );
     }
 
