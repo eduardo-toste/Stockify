@@ -44,23 +44,19 @@ public class TokenService {
         }
     }
 
-    public String getSubject(String token, String expectedType){
-        try {
-            var algoritmo = Algorithm.HMAC256(secret);
-            var decoded = JWT.require(algoritmo)
-                    .withIssuer("API Stockify")
-                    .build()
-                    .verify(token);
+    public String getSubject(String token, String expectedType) {
+        var algoritmo = Algorithm.HMAC256(secret);
+        var decoded = JWT.require(algoritmo)
+                .withIssuer("API Stockify")
+                .build()
+                .verify(token);
 
-            String type = decoded.getClaim("type").asString();
-            if (!expectedType.equals(type)) {
-                throw new RuntimeException("Tipo de token inválido!");
-            }
-
-            return decoded.getSubject();
-        } catch (JWTVerificationException exception) {
-            throw new RuntimeException("Token JWT inválido ou expirado!");
+        String type = decoded.getClaim("type").asString();
+        if (!expectedType.equals(type)) {
+            throw new JWTVerificationException("Tipo de token inválido!");
         }
+
+        return decoded.getSubject();
     }
 
     private Instant dataExpiracaoAccessToken() {
