@@ -82,6 +82,21 @@ class EstatisticasControllerTest {
                 .andExpect(jsonPath("$.precoMaximo").value(0));
     }
 
+    @Test
+    void deveRetornar401QuandoTokenNaoForEnviado() throws Exception {
+        mockMvc.perform(get("/estatisticas"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void deveRetornar401QuandoTokenForInvalido() throws Exception {
+        when(tokenService.getSubject(eq(token), eq("access"))).thenReturn(null);
+
+        mockMvc.perform(get("/estatisticas")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isUnauthorized());
+    }
+
     private void autenticarUsuarioMock() {
         when(tokenService.getSubject(eq(token), eq("access"))).thenReturn(username);
         when(usuarioRepository.findByUsername(username))
