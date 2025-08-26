@@ -1,5 +1,6 @@
 package com.eduardo.stockify.controllers;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.eduardo.stockify.dtos.AutenticacaoRequest;
 import com.eduardo.stockify.dtos.RefreshTokenRequest;
 import com.eduardo.stockify.dtos.TokenResponse;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,8 +46,7 @@ public class AutenticacaoController {
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(@RequestBody RefreshTokenRequest request) {
         if (request.refreshToken() == null || request.refreshToken().isBlank()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new TokenResponse(null, null));
+            throw new JWTVerificationException("Refresh token ausente");
         }
 
         String username = tokenService.getSubject(request.refreshToken(), "refresh");

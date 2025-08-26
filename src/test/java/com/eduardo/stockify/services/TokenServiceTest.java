@@ -43,7 +43,7 @@ class TokenServiceTest {
             tokenService.getSubject(refreshToken, "access");
         });
 
-        assertEquals("Tipo de token inválido!", ex.getMessage());
+        assertEquals("Token JWT inválido ou expirado", ex.getMessage());
     }
 
     @Test
@@ -54,7 +54,7 @@ class TokenServiceTest {
             tokenService.getSubject(tokenInvalido, "access");
         });
 
-        assertEquals("Token JWT inválido ou expirado!", ex.getMessage());
+        assertEquals("Token JWT inválido ou expirado", ex.getMessage());
     }
 
     @Test

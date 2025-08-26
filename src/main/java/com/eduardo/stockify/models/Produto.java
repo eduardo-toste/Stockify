@@ -2,10 +2,7 @@ package com.eduardo.stockify.models;
 
 import com.eduardo.stockify.models.enums.Categoria;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -20,8 +17,12 @@ public class Produto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Setter
     private String nome;
     private String descricao;
+
+    @Setter
     private double preco;
     private int quantidade;
 

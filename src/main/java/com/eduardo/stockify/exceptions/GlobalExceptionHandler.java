@@ -1,5 +1,6 @@
 package com.eduardo.stockify.exceptions;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.eduardo.stockify.utils.ProblemDetailsUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -86,6 +87,36 @@ public class GlobalExceptionHandler {
                 "O parâmetro obrigatório '" + ex.getParameterName() + "' não foi informado.",
                 "MISSING_PARAMETER", req.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(JWTVerificationException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidJwt(JWTVerificationException ex, HttpServletRequest req) {
+        String detail = switch (ex.getMessage()) {
+            case "Refresh token ausente" -> "Refresh token ausente";
+            case "Tipo de token inválido!" -> "Tipo de token inválido!";
+            default -> "Token inválido ou expirado";
+        };
+
+        var body = ProblemDetailsUtils.build(
+                HttpStatus.UNAUTHORIZED,
+                "Não autenticado",
+                detail,
+                "AUTH_FAILED",
+                req.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ProblemDetail> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest req) {
+        var body = ProblemDetailsUtils.build(
+                HttpStatus.UNAUTHORIZED,
+                "Não autenticado",
+                ex.getMessage(),
+                "AUTH_FAILED",
+                req.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 
     // === JSON malformado ou enum inválido ===
